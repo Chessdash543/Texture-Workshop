@@ -20,10 +20,7 @@ class TexturePackCell : public CCLayerColor {
         int opacity;
 
         geode::ByteVector imgData;
-        bool iconPending = false;
         CCLayerGradient* gradient;
-
-        CCSprite* texturePackIconSpr = nullptr;
 
         TexturePack* texturePack;
 
@@ -91,25 +88,33 @@ class TexturePackCell : public CCLayerColor {
                 featuredSpr->setPositionX(30);
             }
             
-            texturePackIconSpr = CCSprite::createWithSpriteFrameName("TWS_PlaceholderLogo.png"_spr);
+            auto texturePackIconSpr = CCSprite::createWithSpriteFrameName("TWS_PlaceholderLogo.png"_spr);
             this->addChild(texturePackIconSpr);
             texturePackIconSpr->setScale(0.35);
             texturePackIconSpr->setPosition(this->getContentSize() / 2);
             texturePackIconSpr->setPositionX(30);
 
             auto txtr = CCTextureCache::get()->textureForKey(fmt::format("logo-{}", tp->name).c_str());
-            // do not retain/autorelease here; we'll schedule texture creation on main thread
+            this->retain();
 
             if (!txtr) {
-                m_getIcon.bind([this, scale, tp] (web::WebTask::Event* e) {
+                m_getIcon.bind([this, texturePackIconSpr, scale, tp] (web::WebTask::Event* e) {
                 if (web::WebResponse* res = e->getValue()) {
-                    if (res->ok() && !res->data().empty()) {
+                    if (res->ok()) {
                         imgData = res->data();
-                        iconPending = true;
-                        this->scheduleOnce(schedule_selector(TexturePackCell::onIconReady), 0.0f);
+                        auto image = Ref(new CCImage());
+                        image->initWithImageData(const_cast<uint8_t*>(res->data().data()),res->data().size());
+                        std::string theKey = fmt::format("logo-{}", tp->name);
+                        auto texture = CCTextureCache::get()->addUIImage(image,theKey.c_str());
+                        image->release();
+                        this->autorelease();
+                        texturePackIconSpr->initWithTexture(texture);
+                        texturePackIconSpr->setScale(0.35 * scale);
                     } else {
-                        // icon failed or empty
+                        // icon has NO icon hwta
                     }
+                    
+                    
                 } else if (e->isCancelled()) {
                     log::info("The request was cancelled... So sad :(");
                 }
@@ -121,9 +126,13 @@ class TexturePackCell : public CCLayerColor {
                 
                 m_getIcon.setFilter(req.get(tp->icon));
             } else {
-                // If a texture is already cached, use it directly instead of
-                // trying to recreate it from `imgData` which may be empty.
-                texturePackIconSpr->initWithTexture(txtr);
+                auto image = Ref(new CCImage());
+                image->initWithImageData(const_cast<uint8_t*>(imgData.data()),imgData.size());
+                std::string theKey = fmt::format("logo-{}", tp->name);
+                auto texture = CCTextureCache::get()->addUIImage(image,theKey.c_str());
+                image->release();
+                this->autorelease();
+                texturePackIconSpr->initWithTexture(texture);
                 texturePackIconSpr->setScale(0.35 * scale);
             }
 
@@ -174,7 +183,17 @@ class TexturePackCell : public CCLayerColor {
             texturePackVersion->setAnchorPoint(ccp(0, 0.5));
             texturePackVersion->setColor(ccc3(0, 200, 255));
 
-            // downloads count removed from UI
+            auto texturePackDownloadsIcon = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
+            texturePackDownloadsIcon->setScale(0.325f);
+            texturePackDownloadsIcon->setPosition(texturePackVersion->getPosition() + ccp(texturePackVersion->getScaledContentWidth() + 8, -0.5f));
+            this->addChild(texturePackDownloadsIcon);
+
+            auto texturePackDownloadsCount = CCLabelBMFont::create(fmt::format("{}", texturePack->downloads).c_str(), "bigFont.fnt");
+            texturePackDownloadsCount->setScale(0.25f);
+            texturePackDownloadsCount->setAnchorPoint(ccp(0, 0.5f));
+            texturePackDownloadsCount->setColor(ccc3(100, 200, 35));
+            texturePackDownloadsCount->setPosition(texturePackDownloadsIcon->getPosition() + ccp(4, 0.5f));
+            this->addChild(texturePackDownloadsCount);
 
 
             auto viewBtnMenu = CCMenu::create();
@@ -237,26 +256,6 @@ class TexturePackCell : public CCLayerColor {
             updateDownloadIndicator();
 
             return true;
-        }
-
-        void onIconReady(float) {
-            if (!iconPending || imgData.empty()) return;
-            iconPending = false;
-
-            auto image = Ref(new CCImage());
-            if (!image->initWithImageData(const_cast<uint8_t*>(imgData.data()), imgData.size())) {
-                image->release();
-                return;
-            }
-
-            std::string theKey = fmt::format("logo-{}", texturePack->name);
-            auto texture = CCTextureCache::get()->addUIImage(image, theKey.c_str());
-            image->release();
-            if (texture && texturePackIconSpr) {
-                texturePackIconSpr->initWithTexture(texture);
-                texturePackIconSpr->setScale(0.35f * (CCDirector::sharedDirector()->getContentScaleFactor()/4));
-            }
-            
         }
 
         void onView(CCObject*) {

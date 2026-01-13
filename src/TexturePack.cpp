@@ -29,19 +29,11 @@ void TexturePack::downloadPack()
                     std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name));
                 }
 
-                {
-                    auto it = std::find(boobs::downloads.begin(), boobs::downloads.end(), this);
-                    if (it != boobs::downloads.end())
-                        boobs::downloads.erase(it);
-                }
+                boobs::downloads.erase(std::find(boobs::downloads.begin(), boobs::downloads.end(), this));
                 
             } else if (e->isCancelled()) {
                 log::info("The request was cancelled... So sad :(");
-                {
-                    auto it = std::find(boobs::downloads.begin(), boobs::downloads.end(), this);
-                    if (it != boobs::downloads.end())
-                        boobs::downloads.erase(it);
-                }
+                boobs::downloads.erase(std::find(boobs::downloads.begin(), boobs::downloads.end(), this));
             }
             else if (auto progress = e->getProgress())
             {

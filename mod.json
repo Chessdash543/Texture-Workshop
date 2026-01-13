@@ -7,10 +7,10 @@
 		"android": "2.2074"
 	},
 	"version": "v1.4.1",
-	"id": "chessdash543.tms",
-	"name": "TMS Workshop",
-	"developer": "Chessdash543",
-	"description": "An Index for Texture Packs of TMS",
+	"id": "uproxide.textures",
+	"name": "Texture Workshop",
+	"developer": "Uproxide",
+	"description": "An Index for Texture Packs :)",
 	"resources": {
 		"spritesheets": {
 			"TWSSheet": [

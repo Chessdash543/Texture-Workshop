@@ -319,11 +319,11 @@ void TextureWorkshopLayer::getTexturePacks() {
         // req.userAgent(fmt::format("TextureWorkshopMod/{}", "1.3.3"));
         req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
         
-        m_listener.setFilter(req.get("https://texture-makers-server.vercel.app/data/tms.json"));
+        m_listener.setFilter(req.get("https://textureworkshop.xyz/api/v1/tws/getTPs"));
 
     } else {
         onGetTPsFinished();
-    }   
+    }
     
 }
 
@@ -378,6 +378,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                 std::string tpDesc;
                 std::string gdVersion;
                 bool featured;
+                int downloads;
 
                 tpName = tpObject["packName"].asString().unwrap();
                 tpCreator = tpObject["packCreator"].asString().unwrap();
@@ -387,7 +388,8 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                 tpDesc = tpObject["packDescription"].asString().unwrap();
                 gdVersion = tpObject["gdVersion"].asString().unwrap();
 
-                // packDownloads removed: no longer tracking download counts
+                if (tpObject.contains("packDownloads")) // idk but i wanna be safe
+                    downloads = tpObject["packDownloads"].asInt().unwrap();
 
                 if (tpObject["packFeature"].asInt().unwrap() == 1) {
                     featured = true;
@@ -401,7 +403,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
                 if (boobs::versionFilter) {
                     if (tpObject["gdVersion"].asString().unwrap() == Loader::get()->getGameVersion() || tpObject["gdVersion"].asString().unwrap() == "Any") {
-                        TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+                        TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                         auto cell = TexturePackCell::create(tp, thing);
                         tps.push_back(tp);
@@ -409,7 +411,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                         scroll->m_contentLayer->addChild(cell);
                         scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
                     } else if (tpObject["gdVersion"].asString().unwrap() == "2.204" && (Loader::get()->getGameVersion() == "2.204" || Loader::get()->getGameVersion() == "2.205")) {
-                        TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+                        TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                         auto cell = TexturePackCell::create(tp, thing);
                         tps.push_back(tp);
@@ -418,7 +420,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                         scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
                     }
                 } else {
-                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                     auto cell = TexturePackCell::create(tp, thing);
                     tps.push_back(tp);
