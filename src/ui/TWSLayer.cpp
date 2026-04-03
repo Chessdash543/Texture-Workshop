@@ -12,8 +12,6 @@ using namespace geode::prelude;
 #include <Geode/ui/GeodeUI.hpp>
 #include <Geode/loader/Event.hpp>
 
-static matjson::Value fullJson;
-
 TWSLayer* TWSLayer::create() {
     auto ret = new TWSLayer();
     if (ret && ret->init()) {
@@ -345,7 +343,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 
     m_getTPslistener.spawn( 
         req.get(url),
-        [this, searchQuery](geode::utils::web::WebResponse res) {
+        [this](geode::utils::web::WebResponse res) {
             //log::debug("Response: {}", value.code());
             //log::debug("Body: {}", value.string().unwrap());
             if (res.ok()) {
@@ -359,30 +357,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                     nextPage->setVisible(false);
                     prevPage->setVisible(false);
                 } else {
-                    fullJson = res.json().unwrap();
-                    // filter
-                    matjson::Array filtered;
-                    bool versionFilter = Mod::get()->getSettingValue<bool>("version-filter");
-                    std::string gameVersion = Loader::get()->getGameVersion();
-                    std::string lowerQuery = searchQuery;
-                    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
-                    for (auto& pack : fullJson.asArray().unwrap()) {
-                        if (versionFilter && pack["gdVersion"].asString().unwrap() != gameVersion) continue;
-                        if (!searchQuery.empty()) {
-                            std::string name = pack["packName"].asString().unwrap();
-                            std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-                            if (name.find(lowerQuery) == std::string::npos) continue;
-                        }
-                        filtered.push_back(pack);
-                    }
-                    // slice
-                    int start = (boobs::page - 1) * 10;
-                    int end = std::min(start + 10, (int)filtered.size());
-                    matjson::Array sliced;
-                    for (int i = start; i < end; i++) {
-                        sliced.push_back(filtered[i]);
-                    }
-                    pageJson = sliced;
+                    pageJson = res.json().unwrap();
                     //log::debug("Page JSON: {}", pageJson.dump());
                     setupTPCells();
                 }
@@ -402,40 +377,58 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 
 void TWSLayer::getTexturePacksCount(std::string searchQuery) {
     log::info("Getting TP count for page {} with search query '{}'", boobs::page, searchQuery);
-    // filter
-    matjson::Array filtered;
-    bool versionFilter = Mod::get()->getSettingValue<bool>("version-filter");
-    std::string gameVersion = Loader::get()->getGameVersion();
-    std::string lowerQuery = searchQuery;
-    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
-    for (auto& pack : fullJson.asArray().unwrap()) {
-        if (versionFilter && pack["gdVersion"].asString().unwrap() != gameVersion) continue;
-        if (!searchQuery.empty()) {
-            std::string name = pack["packName"].asString().unwrap();
-            std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-            if (name.find(lowerQuery) == std::string::npos) continue;
+    auto req2 = geode::utils::web::WebRequest();
+    std::string pageCountUrl = fmt::format("https://texture-makers-server.vercel.app/data/tms_count.json?page={}", boobs::page);
+
+    if (Mod::get()->getSettingValue<bool>("version-filter")) {
+        std::string currentPageUrlStr = pageCountUrl;
+        pageCountUrl = fmt::format("{}&version={}", currentPageUrlStr, Loader::get()->getGameVersion());
+    }
+
+    if (!searchQuery.empty()) {
+        std::string currentPageUrlStr = pageCountUrl;
+        size_t pos = 0;
+        while ((pos = searchQuery.find(" ", pos)) != std::string::npos) {
+            searchQuery.replace(pos, 1, "%20");
+            pos += 3;
         }
-        filtered.push_back(pack);
+        pageCountUrl = fmt::format("{}&search={}", currentPageUrlStr, searchQuery);
     }
-    int total = filtered.size();
-    int pageCount = (total + 9) / 10;
-    if (pageCount < boobs::page) {
-        boobs::page = pageCount;
-        getTexturePacks(boobs::search);
-        nextPage->setVisible(false);
-    }
-    auto director = CCDirector::sharedDirector();
-    std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, pageCount, total);
-    if (pageCount) {
-        pageCount->setString(formattedText.c_str());
-        pageCount->setVisible(true);
-    } else {
-        pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
-        this->addChild(pageCount);
-        pageCount->setScale(0.3);
-        pageCount->setAnchorPoint({1, 1});
-        pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
-    }
+
+    m_getTPsCountlistener.spawn( 
+        req2.get(pageCountUrl),
+        [this](geode::utils::web::WebResponse res) {
+            log::debug("Response: {}", res.code());
+            log::debug("Body: {}", res.string().unwrap());
+            if (!res.ok() || res.json().unwrap()["success"].asBool().unwrap() == false) {
+                log::error("Failed to get TP count: {}", res.string().unwrap());
+            } else {
+                if (res.json().unwrap()["count"].asInt().unwrap() == 0) {
+                    return;
+                }
+
+                if (res.json().unwrap()["pageCount"].asInt().unwrap() < boobs::page) {
+                    boobs::page = res.json().unwrap()["pageCount"].asInt().unwrap();
+                    getTexturePacks(boobs::search);
+                    nextPage->setVisible(false);
+                }
+
+                auto director = CCDirector::sharedDirector();
+                std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, res.json().unwrap()["pageCount"].asInt().unwrap(), res.json().unwrap()["count"].asInt().unwrap()).c_str();
+                if (pageCount) {
+                    pageCount->setString(formattedText.c_str());
+                    pageCount->setVisible(true);
+                } else {
+                    pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
+                    this->addChild(pageCount);
+                    pageCount->setScale(0.3);
+                    pageCount->setAnchorPoint({1, 1});
+                    pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                }
+                
+            }
+        }
+    );
 }
 
 void TWSLayer::setupTPCells() {
