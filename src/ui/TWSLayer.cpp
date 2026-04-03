@@ -326,7 +326,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
             if (res.ok()) {
                 auto fullJson = res.json().unwrap();
 
-                if (fullJson.empty()) {
+                if (fullJson.size() == 0) {
                     auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
                     outline->addChild(errorText);
                     errorText->setScale(0.3);
@@ -353,7 +353,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 
                 matjson::Value pageSubset = matjson::Value::array();
                 for (int i = start; i < end; i++) {
-                    pageSubset.push(pageSubset.size(), fullJson[i]);
+                    pageSubset.push(fullJson[i]);
                 }
 
                 setupTPCells(pageSubset); // chama a função nova com o subset da página
