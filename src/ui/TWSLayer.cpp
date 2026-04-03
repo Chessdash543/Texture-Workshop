@@ -297,57 +297,36 @@ bool TWSLayer::init() {
 }
 
 void TWSLayer::getTexturePacks(std::string searchQuery) {
-    if (scroll && scroll->m_contentLayer->getChildrenCount() > 0) scroll->m_contentLayer->removeAllChildren();
+    if (scroll && scroll->m_contentLayer->getChildrenCount() > 0) 
+        scroll->m_contentLayer->removeAllChildren();
 
-    if (pageCount) {
-        pageCount->setVisible(false);
-    }
-
+    if (pageCount) pageCount->setVisible(false);
     if (loading) loading->setVisible(true);
-
-    //if (pagesMenu) pagesMenu->setVisible(false);
 
     if (auto errorSlop = outline->getChildByID("error-text"_spr)) {
         outline->removeChild(errorSlop, true);
     }
 
-    //if (nextPage && nextPage->isVisible()) nextPage->setVisible(false);
-    //if (prevPage && prevPage->isVisible()) prevPage->setVisible(false);
-    
     auto req = geode::utils::web::WebRequest();
 
-    req.onProgress([](geode::utils::web::WebProgress const& progress) {
-        //log::debug("Progress: ", progress.downloadProgress());
-    });
-
-    //log::info("{}", boobs::page);
-
-    std::string url = fmt::format("https://texture-makers-server.vercel.app/data/tms.json", boobs::page);
-
-    if (Mod::get()->getSettingValue<bool>("version-filter")) {
-        std::string currentUrlStr = url;
-        url = fmt::format("{}&version={}", currentUrlStr, Loader::get()->getGameVersion());
-    }
+    std::string url = "https://texture-makers-server.vercel.app/data/tms.json";
 
     if (!searchQuery.empty()) {
-        std::string currentUrlStr = url;
         size_t pos = 0;
         while ((pos = searchQuery.find(" ", pos)) != std::string::npos) {
             searchQuery.replace(pos, 1, "%20");
             pos += 3;
         }
-        url = fmt::format("{}&search={}", currentUrlStr, searchQuery);
+        url += "&search=" + searchQuery;
     }
-
-    //log::info("{}", Loader::get()->getGameVersion());
 
     m_getTPslistener.spawn( 
         req.get(url),
         [this](geode::utils::web::WebResponse res) {
-            //log::debug("Response: {}", value.code());
-            //log::debug("Body: {}", value.string().unwrap());
             if (res.ok()) {
-                if (res.string().unwrap() == "{}") {
+                auto fullJson = res.json().unwrap();
+
+                if (fullJson.empty()) {
                     auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
                     outline->addChild(errorText);
                     errorText->setScale(0.3);
@@ -356,11 +335,29 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                     loading->setVisible(false);
                     nextPage->setVisible(false);
                     prevPage->setVisible(false);
-                } else {
-                    pageJson = res.json().unwrap();
-                    //log::debug("Page JSON: {}", pageJson.dump());
-                    setupTPCells();
+                    return;
                 }
+
+                // PAGINAÇÃO LOCAL
+                int itemsPerPage = 10;
+                int start = (boobs::page - 1) * itemsPerPage;
+                int end = std::min(start + itemsPerPage, (int)fullJson.size());
+
+                if (start >= fullJson.size()) {
+                    // Página fora do alcance
+                    nextPage->setVisible(false);
+                    prevPage->setVisible(boobs::page > 1);
+                    loading->setVisible(false);
+                    return;
+                }
+
+                nlohmann::json pageSubset = nlohmann::json::array();
+                for (int i = start; i < end; i++) {
+                    pageSubset.push_back(fullJson[i]);
+                }
+
+                setupTPCells(pageSubset); // chama a função nova com o subset da página
+
             } else {
                 auto errorText = CCLabelBMFont::create("Something went wrong while getting TPs!\nPlease try again later.", "bigFont.fnt");
                 outline->addChild(errorText);
@@ -431,7 +428,7 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
     );
 }
 
-void TWSLayer::setupTPCells() {
+void TWSLayer::setupTPCells(const nlohmann::json& pageSubset) {
     if (pagesMenu) pagesMenu->setVisible(true);
     int i = 0;
     scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
@@ -441,22 +438,11 @@ void TWSLayer::setupTPCells() {
 
     tps.clear();
 
-    if (boobs::page > 1) {
-        prevPage->setVisible(true);
-    } else {
-        prevPage->setVisible(false);
-    }
+    prevPage->setVisible(boobs::page > 1);
     nextPage->setVisible(true);
 
-    for (auto& value : pageJson) {
-        auto tpObject = value;
-
-        bool featured = false;
-        if (tpObject["packFeature"].asInt().unwrap() == 1) {
-            featured = true;
-        } else {
-            featured = false;
-        }
+    for (auto& tpObject : pageSubset) {
+        bool featured = tpObject["packFeature"].asInt().unwrap() == 1;
 
         TWSPack* tp = TWSPack::create(
             tpObject["packID"].asInt().unwrap(),
@@ -482,13 +468,8 @@ void TWSLayer::setupTPCells() {
             }
         }
 
-        TWSPackCell* tpCell;
-
-        if (existingTp) {
-            tpCell = TWSPackCell::create(existingTp, stupid);
-        } else {
-            tpCell = TWSPackCell::create(tp, stupid);
-        }
+        TWSPackCell* tpCell = existingTp ? TWSPackCell::create(existingTp, stupid)
+                                         : TWSPackCell::create(tp, stupid);
 
         scroll->m_contentLayer->addChild(tpCell);
         tpCell->setPosition(0, 314 - (35 * i));
@@ -496,11 +477,12 @@ void TWSLayer::setupTPCells() {
         tpCell->inp = inp;
         i++;
     }
+
     if (i < 10) {
         nextPage->setVisible(false);
     }
-    int tpCount = scroll->m_contentLayer->getChildrenCount();
-    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, (35 * 10)));
+
+    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 35 * 10));
     scroll->moveToTop();
 }
 
