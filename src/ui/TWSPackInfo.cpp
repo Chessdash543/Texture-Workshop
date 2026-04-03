@@ -19,12 +19,12 @@ bool TWSPackInfo::init(TWSPack* tp)
             if (!result.isOk()) 
             {
                 if (reloadIconTries < 3) {
-                    log::info("failed to load icon, please refresh this TWS page to try again."); 
-                    // fallback
-                    icon->initWithSpriteFrameName("TWS_Error.png"_spr);
-                } else {
+                    log::info("failed to load icon, retrying... (attempt {}/3)", reloadIconTries + 1); 
                     icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
                     reloadIconTries += 1;
+                } else {
+                    log::error("failed to load icon after 3 attempts, showing fallback."); 
+                    icon->initWithSpriteFrameName("TWS_Error.png"_spr);
                 }
             }
 
