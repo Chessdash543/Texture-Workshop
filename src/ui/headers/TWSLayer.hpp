@@ -59,7 +59,7 @@ public:
 
     void getTexturePacks(std::string searchQuery);
     void getTexturePacksCount(std::string searchQuery);
-    void setupTPCells();
+    void setupTPCells(const matjson::Value& pageSubset);
 
     void onDiscord(CCObject*);
     void onSupport(CCObject*);

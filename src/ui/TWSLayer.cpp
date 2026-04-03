@@ -351,9 +351,9 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                     return;
                 }
 
-                nlohmann::json pageSubset = nlohmann::json::array();
+                matjson::Value pageSubset = matjson::Value::array();
                 for (int i = start; i < end; i++) {
-                    pageSubset.push_back(fullJson[i]);
+                    pageSubset.push(pageSubset.size(), fullJson[i]);
                 }
 
                 setupTPCells(pageSubset); // chama a função nova com o subset da página
@@ -428,7 +428,7 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
     );
 }
 
-void TWSLayer::setupTPCells(const nlohmann::json& pageSubset) {
+void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
     if (pagesMenu) pagesMenu->setVisible(true);
     int i = 0;
     scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
