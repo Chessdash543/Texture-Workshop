@@ -322,7 +322,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 
     //log::info("{}", boobs::page);
 
-    std::string url = fmt::format("https://textureworkshop.xyz/api/v2/tws/getTPs?page={}", boobs::page);
+    std::string url = fmt::format("https://texture-makers-server.vercel.app/data/tms.json", boobs::page);
 
     if (Mod::get()->getSettingValue<bool>("version-filter")) {
         std::string currentUrlStr = url;
@@ -378,7 +378,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 void TWSLayer::getTexturePacksCount(std::string searchQuery) {
     log::info("Getting TP count for page {} with search query '{}'", boobs::page, searchQuery);
     auto req2 = geode::utils::web::WebRequest();
-    std::string pageCountUrl = fmt::format("https://textureworkshop.xyz/api/v1/tws/getTPsCount?page={}", boobs::page);
+    std::string pageCountUrl = fmt::format("https://texture-makers-server.vercel.app/data/tms_count.json?page={}", boobs::page);
 
     if (Mod::get()->getSettingValue<bool>("version-filter")) {
         std::string currentPageUrlStr = pageCountUrl;
