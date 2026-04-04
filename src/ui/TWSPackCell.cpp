@@ -70,21 +70,6 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     versionLabel->setZOrder(1);
     this->addChild(versionLabel);
 
-    downloadCount = CCLabelBMFont::create(fmt::format("{}", tp->downloads).c_str(), "bigFont.fnt");
-    downloadCount->setScale(0.2);
-    downloadCount->setAnchorPoint(ccp(0, 1));
-    downloadCount->setPosition(ccp(versionLabel->getPosition().x + versionLabel->getScaledContentWidth() + 8, 12)); // OH BOY I LOVE HARDCODING! kinda? wat?
-    downloadCount->setColor({0, 255, 33});
-    downloadCount->setZOrder(1);
-    this->addChild(downloadCount);
-
-    auto downloadIcons = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
-    downloadIcons->setScale(0.25);
-    downloadIcons->setAnchorPoint(ccp(1, 1));
-    downloadIcons->setPosition(ccp(downloadCount->getPosition().x - .3f, 11));
-    downloadIcons->setZOrder(1);
-    this->addChild(downloadIcons);
-
     auto texturePackCreator = CCLabelBMFont::create(
         fmt::format("By: {}", tp->TPCreator).c_str(),
         "goldFont.fnt"

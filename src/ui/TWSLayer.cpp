@@ -317,8 +317,10 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
             searchQuery.replace(pos, 1, "%20");
             pos += 3;
         }
-        url += "&search=" + searchQuery;
+        url += "?search=" + searchQuery;
     }
+
+    log::debug("Fetching texture packs from: {}", url);
 
     m_getTPslistener.spawn( 
         req.get(url),
@@ -359,6 +361,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                 setupTPCells(pageSubset); // chama a função nova com o subset da página
 
             } else {
+                log::error("Failed to fetch texture packs (HTTP {}): {}", res.code(), res.string().unwrap_or("unknown error"));
                 auto errorText = CCLabelBMFont::create("Something went wrong while getting TPs!\nPlease try again later.", "bigFont.fnt");
                 outline->addChild(errorText);
                 errorText->setScale(0.3);
@@ -392,39 +395,47 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
         pageCountUrl = fmt::format("{}&search={}", currentPageUrlStr, searchQuery);
     }
 
+    log::debug("Fetching TP count from: {}", pageCountUrl);
+
     m_getTPsCountlistener.spawn( 
         req2.get(pageCountUrl),
         [this](geode::utils::web::WebResponse res) {
-            log::debug("Response: {}", res.code());
-            log::debug("Body: {}", res.string().unwrap());
-            if (!res.ok() || res.json().unwrap()["success"].asBool().unwrap() == false) {
-                log::error("Failed to get TP count: {}", res.string().unwrap());
+            log::debug("Response code: {}", res.code());
+            if (!res.ok()) {
+                log::error("Failed to get TP count (HTTP {}): {}", res.code(), res.string().unwrap_or("unknown error"));
             } else {
-                if (res.json().unwrap()["count"].asInt().unwrap() == 0) {
-                    return;
-                }
-
-                if (res.json().unwrap()["pageCount"].asInt().unwrap() < boobs::page) {
-                    boobs::page = res.json().unwrap()["pageCount"].asInt().unwrap();
-                    getTexturePacks(boobs::search);
-                    nextPage->setVisible(false);
-                }
-
-                auto director = CCDirector::sharedDirector();
-                std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, res.json().unwrap()["pageCount"].asInt().unwrap(), res.json().unwrap()["count"].asInt().unwrap()).c_str();
-                if (pageCount) {
-                    pageCount->setString(formattedText.c_str());
-                    pageCount->setVisible(true);
+                auto jsonRes = res.json().unwrap();
+                log::debug("Response body: {}", res.string().unwrap_or(""));
+                if (jsonRes["success"].asBool().unwrap_or(false) == false) {
+                    log::error("Failed to get TP count: success=false");
                 } else {
-                    pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
-                    this->addChild(pageCount);
-                    pageCount->setScale(0.3);
-                    pageCount->setAnchorPoint({1, 1});
-                    pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                    if (jsonRes["count"].asInt().unwrap() == 0) {
+                        return;
+                    }
+
+                    if (jsonRes["pageCount"].asInt().unwrap() < boobs::page) {
+                        boobs::page = jsonRes["pageCount"].asInt().unwrap();
+                        getTexturePacks(boobs::search);
+                        nextPage->setVisible(false);
+                    }
+
+                    auto director = CCDirector::sharedDirector();
+                    std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, jsonRes["pageCount"].asInt().unwrap(), jsonRes["count"].asInt().unwrap()).c_str();
+                    if (pageCount) {
+                        pageCount->setString(formattedText.c_str());
+                        pageCount->setVisible(true);
+                    } else {
+                        pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
+                        this->addChild(pageCount);
+                        pageCount->setScale(0.3);
+                        pageCount->setAnchorPoint({1, 1});
+                        pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                    }
                 }
-                
             }
         }
+    );
+}
     );
 }
 

@@ -26,7 +26,6 @@ public:
     
     void updateDownloadStata(); // stata 
 
-    CCLabelBMFont* downloadCount;
     CCLabelBMFont* versionLabel;
     CCLabelBMFont* nameLabel;
 

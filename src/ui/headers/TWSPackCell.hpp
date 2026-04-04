@@ -21,7 +21,6 @@ class TWSPackCell : public CCLayerColor {
         geode::LazySprite* icon;
         CCLabelBMFont* nameLabel;
         CCLabelBMFont* versionLabel;
-        CCLabelBMFont* downloadCount;
         CCLayerGradient* gradient;
 
         CCMenuItemSpriteExtra* tpDownload;

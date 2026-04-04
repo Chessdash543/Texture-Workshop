@@ -78,21 +78,6 @@ bool TWSPackInfo::init(TWSPack* tp)
     versionLabel->setZOrder(1);
     this->m_mainLayer->addChild(versionLabel);
 
-    downloadCount = CCLabelBMFont::create(fmt::format("{}", tp->downloads).c_str(), "bigFont.fnt");
-    downloadCount->setScale(0.3);
-    downloadCount->setAnchorPoint(ccp(0, 1));
-    downloadCount->setPosition(ccp(versionLabel->getPosition().x + versionLabel->getScaledContentWidth() + 10, 183.5)); // OH BOY I LOVE HARDCODING! kinda? wat?
-    downloadCount->setColor({0, 255, 33});
-    downloadCount->setZOrder(1);
-    this->m_mainLayer->addChild(downloadCount);
-
-    auto downloadIcons = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
-    downloadIcons->setScale(0.35);
-    downloadIcons->setAnchorPoint(ccp(1, 1));
-    downloadIcons->setPosition(ccp(downloadCount->getPosition().x - .3f, 182.5));
-    downloadIcons->setZOrder(1);
-    this->m_mainLayer->addChild(downloadIcons);
-
     auto buttonMenu = CCMenu::create();
     buttonMenu->setContentSize(this->getContentSize());
     buttonMenu->setAnchorPoint(ccp(0, 1));
