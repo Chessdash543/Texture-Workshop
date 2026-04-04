@@ -361,7 +361,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                 setupTPCells(pageSubset); // chama a função nova com o subset da página
 
             } else {
-                log::error("Failed to fetch texture packs (HTTP {}): {}", res.code(), res.string().unwrap_or("unknown error"));
+                log::error("Failed to fetch texture packs (HTTP {})", res.code());
                 auto errorText = CCLabelBMFont::create("Something went wrong while getting TPs!\nPlease try again later.", "bigFont.fnt");
                 outline->addChild(errorText);
                 errorText->setScale(0.3);
@@ -402,40 +402,39 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
         [this](geode::utils::web::WebResponse res) {
             log::debug("Response code: {}", res.code());
             if (!res.ok()) {
-                log::error("Failed to get TP count (HTTP {}): {}", res.code(), res.string().unwrap_or("unknown error"));
+                log::error("Failed to get TP count (HTTP {})", res.code());
             } else {
                 auto jsonRes = res.json().unwrap();
-                log::debug("Response body: {}", res.string().unwrap_or(""));
-                if (jsonRes["success"].asBool().unwrap_or(false) == false) {
-                    log::error("Failed to get TP count: success=false");
-                } else {
-                    if (jsonRes["count"].asInt().unwrap() == 0) {
-                        return;
-                    }
-
-                    if (jsonRes["pageCount"].asInt().unwrap() < boobs::page) {
-                        boobs::page = jsonRes["pageCount"].asInt().unwrap();
-                        getTexturePacks(boobs::search);
-                        nextPage->setVisible(false);
-                    }
-
-                    auto director = CCDirector::sharedDirector();
-                    std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, jsonRes["pageCount"].asInt().unwrap(), jsonRes["count"].asInt().unwrap()).c_str();
-                    if (pageCount) {
-                        pageCount->setString(formattedText.c_str());
-                        pageCount->setVisible(true);
+                if (auto success = jsonRes["success"].asBool()) {
+                    if (*success == false) {
+                        log::error("Failed to get TP count: success=false");
                     } else {
-                        pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
-                        this->addChild(pageCount);
-                        pageCount->setScale(0.3);
-                        pageCount->setAnchorPoint({1, 1});
-                        pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                        if (jsonRes["count"].asInt().unwrap() == 0) {
+                            return;
+                        }
+
+                        if (jsonRes["pageCount"].asInt().unwrap() < boobs::page) {
+                            boobs::page = jsonRes["pageCount"].asInt().unwrap();
+                            getTexturePacks(boobs::search);
+                            nextPage->setVisible(false);
+                        }
+
+                        auto director = CCDirector::sharedDirector();
+                        std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, jsonRes["pageCount"].asInt().unwrap(), jsonRes["count"].asInt().unwrap()).c_str();
+                        if (pageCount) {
+                            pageCount->setString(formattedText.c_str());
+                            pageCount->setVisible(true);
+                        } else {
+                            pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
+                            this->addChild(pageCount);
+                            pageCount->setScale(0.3);
+                            pageCount->setAnchorPoint({1, 1});
+                            pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                        }
                     }
                 }
             }
         }
-    );
-}
     );
 }
 
