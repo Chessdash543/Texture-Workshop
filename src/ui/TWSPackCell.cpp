@@ -31,20 +31,13 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
             if (!result.isOk()) 
             {
                 if (reloadIconTries < 3) {
-                    log::info("failed to load icon, please refresh this TWS page to try again."); 
-                    // fallback
-                    icon->initWithSpriteFrameName("TWS_Error.png"_spr);
-                } else {
+                    log::info("failed to load icon, retrying... (attempt {}/3)", reloadIconTries + 1); 
                     icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
                     reloadIconTries += 1;
+                } else {
+                    log::error("failed to load icon after 3 attempts, showing fallback.");
+                    icon->initWithSpriteFrameName("TWS_Error.png"_spr);
                 }
-            }
-
-            if (texturePack->featured) {
-                auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
-                featuredSpr->setScale(0.35);
-                featuredSpr->setPosition({ 18, this->getContentSize().height / 2 });
-                this->addChild(featuredSpr);
             }
         }
     );
@@ -53,6 +46,13 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     icon->setScale(0.35 * scale);
     icon->setPosition({ 18, this->getContentSize().height / 2 });
     icon->setZOrder(1);
+
+    if (texturePack->featured) {
+        auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
+        featuredSpr->setScale(0.35);
+        featuredSpr->setPosition({ 18, this->getContentSize().height / 2 });
+        this->addChild(featuredSpr);
+    }
 
     // name setup yay
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");

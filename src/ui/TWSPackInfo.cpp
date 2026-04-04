@@ -27,13 +27,6 @@ bool TWSPackInfo::init(TWSPack* tp)
                     icon->initWithSpriteFrameName("TWS_Error.png"_spr);
                 }
             }
-
-            if (tp->featured) {
-                auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
-                featuredSpr->setScale(0.6);
-                featuredSpr->setPosition({ 45, 189.5 });
-                this->m_mainLayer->addChild(featuredSpr);
-            }
         }
     );
     this->m_mainLayer->addChild(icon);
@@ -41,6 +34,13 @@ bool TWSPackInfo::init(TWSPack* tp)
     icon->setScale(0.6 * scale);
     icon->setPosition({ 45, 189.5 });
     icon->setZOrder(1);
+
+    if (tp->featured) {
+        auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
+        featuredSpr->setScale(0.6);
+        featuredSpr->setPosition({ 45, 189.5 });
+        this->m_mainLayer->addChild(featuredSpr);
+    }
 
     auto line = CCSprite::createWithSpriteFrameName("floorLine_001.png");
     this->m_mainLayer->addChild(line);
