@@ -62,7 +62,11 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     nameLabel->setZOrder(1);
     this->addChild(nameLabel);
 
-    versionLabel = CCLabelBMFont::create(fmt::format("v{}", tp->TPVersion).c_str(), "bigFont.fnt");
+    std::string versionStr = tp->TPVersion;
+    if (versionStr.empty() || versionStr[0] != 'v') {
+        versionStr = "v" + versionStr;
+    }
+    versionLabel = CCLabelBMFont::create(versionStr.c_str(), "bigFont.fnt");
     versionLabel->setScale(0.2);
     versionLabel->setAnchorPoint(ccp(0, 1));
     versionLabel->setPosition({35.5, 12}); // OH BOY I LOVE HARDCODING!
