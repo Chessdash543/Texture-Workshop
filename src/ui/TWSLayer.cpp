@@ -434,7 +434,7 @@ void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
             tpObject["packID"].asInt().unwrap(),
             tpObject["packName"].asString().unwrap(),
             tpObject["downloadLink"].asString().unwrap(),
-            tpObject["packLogo"].asString().unwrap(),
+            "https://texture-makers-server.vercel.app" + tpObject["packLogo"].asString().unwrap(),
             tpObject["packDescription"].asString().unwrap(),
             tpObject["packCreator"].asString().unwrap(),
             tpObject["packVersion"].asString().unwrap(),
