@@ -35,8 +35,8 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
                     icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
                     reloadIconTries += 1;
                 } else {
-                    log::error("failed to load icon after 3 attempts, showing fallback.");
-                    icon->initWithSpriteFrameName("TWS_Error.png"_spr);
+                    log::error("failed to load icon after 3 attempts, hiding icon.");
+                    icon->setVisible(false);
                 }
             }
         }

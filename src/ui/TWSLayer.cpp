@@ -326,9 +326,9 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
         req.get(url),
         [this](geode::utils::web::WebResponse res) {
             if (res.ok()) {
-                auto fullJson = res.json().unwrap();
+                pageJson = res.json().unwrap();
 
-                if (fullJson.size() == 0) {
+                if (pageJson.size() == 0) {
                     auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
                     outline->addChild(errorText);
                     errorText->setScale(0.3);
@@ -343,9 +343,9 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                 // PAGINAÇÃO LOCAL
                 int itemsPerPage = 10;
                 int start = (boobs::page - 1) * itemsPerPage;
-                int end = std::min(start + itemsPerPage, (int)fullJson.size());
+                int end = std::min(start + itemsPerPage, (int)pageJson.size());
 
-                if (start >= fullJson.size()) {
+                if (start >= pageJson.size()) {
                     // Página fora do alcance
                     nextPage->setVisible(false);
                     prevPage->setVisible(boobs::page > 1);
@@ -355,7 +355,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 
                 matjson::Value pageSubset = matjson::Value::array();
                 for (int i = start; i < end; i++) {
-                    pageSubset.push(fullJson[i]);
+                    pageSubset.push(pageJson[i]);
                 }
 
                 setupTPCells(pageSubset); // chama a função nova com o subset da página
@@ -376,66 +376,42 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 }
 
 void TWSLayer::getTexturePacksCount(std::string searchQuery) {
-    log::info("Getting TP count for page {} with search query '{}'", boobs::page, searchQuery);
-    auto req2 = geode::utils::web::WebRequest();
-    std::string pageCountUrl = fmt::format("https://texture-makers-server.vercel.app/data/tms_count.json?page={}", boobs::page);
-
-    if (Mod::get()->getSettingValue<bool>("version-filter")) {
-        std::string currentPageUrlStr = pageCountUrl;
-        pageCountUrl = fmt::format("{}&version={}", currentPageUrlStr, Loader::get()->getGameVersion());
+    // Since pagination is done client-side, we calculate page info from already loaded data
+    if (!pageJson.isArray() || pageJson.size() == 0) {
+        log::warn("No texture pack data available for pagination calculation");
+        return;
     }
 
-    if (!searchQuery.empty()) {
-        std::string currentPageUrlStr = pageCountUrl;
-        size_t pos = 0;
-        while ((pos = searchQuery.find(" ", pos)) != std::string::npos) {
-            searchQuery.replace(pos, 1, "%20");
-            pos += 3;
-        }
-        pageCountUrl = fmt::format("{}&search={}", currentPageUrlStr, searchQuery);
+    int totalItems = pageJson.size();
+    int itemsPerPage = 10;
+    int totalPages = (totalItems + itemsPerPage - 1) / itemsPerPage; // Ceiling division
+
+    // Ensure current page is valid
+    if (boobs::page > totalPages) {
+        boobs::page = totalPages;
+        getTexturePacks(boobs::search); // Reload with correct page
+        return;
     }
 
-    log::debug("Fetching TP count from: {}", pageCountUrl);
+    // Update page navigation visibility
+    prevPage->setVisible(boobs::page > 1);
+    nextPage->setVisible(boobs::page < totalPages);
 
-    m_getTPsCountlistener.spawn( 
-        req2.get(pageCountUrl),
-        [this](geode::utils::web::WebResponse res) {
-            log::debug("Response code: {}", res.code());
-            if (!res.ok()) {
-                log::error("Failed to get TP count (HTTP {})", res.code());
-            } else {
-                auto jsonRes = res.json().unwrap();
-                if (auto success = jsonRes["success"].asBool()) {
-                    if (*success == false) {
-                        log::error("Failed to get TP count: success=false");
-                    } else {
-                        if (jsonRes["count"].asInt().unwrap() == 0) {
-                            return;
-                        }
+    // Update page count display
+    auto director = CCDirector::sharedDirector();
+    std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, totalPages, totalItems).c_str();
+    if (pageCount) {
+        pageCount->setString(formattedText.c_str());
+        pageCount->setVisible(true);
+    } else {
+        pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
+        this->addChild(pageCount);
+        pageCount->setScale(0.3);
+        pageCount->setAnchorPoint({1, 1});
+        pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+    }
 
-                        if (jsonRes["pageCount"].asInt().unwrap() < boobs::page) {
-                            boobs::page = jsonRes["pageCount"].asInt().unwrap();
-                            getTexturePacks(boobs::search);
-                            nextPage->setVisible(false);
-                        }
-
-                        auto director = CCDirector::sharedDirector();
-                        std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, jsonRes["pageCount"].asInt().unwrap(), jsonRes["count"].asInt().unwrap()).c_str();
-                        if (pageCount) {
-                            pageCount->setString(formattedText.c_str());
-                            pageCount->setVisible(true);
-                        } else {
-                            pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
-                            this->addChild(pageCount);
-                            pageCount->setScale(0.3);
-                            pageCount->setAnchorPoint({1, 1});
-                            pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
-                        }
-                    }
-                }
-            }
-        }
-    );
+    log::info("Calculated pagination: Page {}/{} ({} total items)", boobs::page, totalPages, totalItems);
 }
 
 void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
