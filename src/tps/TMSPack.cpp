@@ -1,11 +1,11 @@
 using namespace geode::prelude;
 
-#include "headers/TWSPack.hpp"
-#include "../ui/headers/TWSPackCell.hpp"
-#include "../ui/headers/TWSPackInfo.hpp"
+#include "headers/TMSPack.hpp"
+#include "../ui/headers/TMSPackCell.hpp"
+#include "../ui/headers/TMSPackInfo.hpp"
 #include "../header/boobs.hpp"
 
-void TWSPack::downloadTP() {
+void TMSPack::downloadTP() {
     isDownloading = true;
     boobs::downloading.push_back(this);
     if (cell) {

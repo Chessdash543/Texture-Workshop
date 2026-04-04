@@ -8,15 +8,15 @@ else()
 endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project(TWS VERSION 2.0.0)
+project(TMS VERSION 2.0.0)
 
 add_library(${PROJECT_NAME} SHARED
     src/hooks/MenuLayer.cpp
-    src/ui/TWSLayer.cpp
-    src/ui/TWSPackCell.cpp
-    src/ui/TWSPackInfo.cpp
-    src/ui/TWSFilters.cpp
-    src/tps/TWSPack.cpp
+    src/ui/TMSLayer.cpp
+    src/ui/TMSPackCell.cpp
+    src/ui/TMSPackInfo.cpp
+    src/ui/TMSFilters.cpp
+    src/tps/TMSPack.cpp
     # Add your cpp files here
 )
 

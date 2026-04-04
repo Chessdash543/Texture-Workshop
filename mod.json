@@ -7,14 +7,14 @@
 		"android": "2.2081"
 	},
 	"version": "v2.0.5",
-	"id": "uproxide.textures",
-	"name": "Texture Workshop",
+	"id": "chessdash543.tms",
+	"name": "Texture Makers Server",
 	"developer": "Uproxide",
-	"description": "An index for Texture Packs :)",
+	"description": "A fork from Texture WorkShop :)",
 	"resources": {
 		"spritesheets": {
-			"TWSSheet": [
-				"resources/TWSSheet/*.png"
+			"TMSSheet": [
+				"resources/TMSSheet/*.png"
 			]
 		},
 		"sprites": [

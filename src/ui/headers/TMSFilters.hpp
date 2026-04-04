@@ -10,10 +10,10 @@
 
 using namespace geode::prelude;
 
-class TWSFilters: public Popup {
+class TMSFilters: public Popup {
 public:
-    static TWSFilters* create() {
-        auto popup = new TWSFilters;
+    static TMSFilters* create() {
+        auto popup = new TMSFilters;
         if (popup->init()) {
             popup->autorelease();
             return popup;

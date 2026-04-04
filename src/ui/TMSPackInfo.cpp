@@ -1,9 +1,9 @@
-#include "./headers/TWSPackInfo.hpp"
-#include "./headers/TWSPackCell.hpp"
+#include "./headers/TMSPackInfo.hpp"
+#include "./headers/TMSPackCell.hpp"
 
-bool TWSPackInfo::init(TWSPack* tp)
+bool TMSPackInfo::init(TMSPack* tp)
 {
-    if (!Popup::init(335.f, 231.f, "TWS_Box.png"_spr))
+    if (!Popup::init(335.f, 231.f, "TMS_Box.png"_spr))
         return false;
 
     int reloadIconTries = 0;
@@ -36,7 +36,7 @@ bool TWSPackInfo::init(TWSPack* tp)
     icon->setZOrder(1);
 
     if (tp->featured) {
-        auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
+        auto featuredSpr = CCSprite::createWithSpriteFrameName("TMS_Featured.png"_spr);
         featuredSpr->setScale(0.6);
         featuredSpr->setPosition({ 45, 189.5 });
         this->m_mainLayer->addChild(featuredSpr);
@@ -84,22 +84,22 @@ bool TWSPackInfo::init(TWSPack* tp)
     buttonMenu->setPosition(0,0);
     this->m_mainLayer->addChild(buttonMenu);
 
-    auto tpDownloadSpr = CCSprite::createWithSpriteFrameName("TWS_DownloadButton.png"_spr);
+    auto tpDownloadSpr = CCSprite::createWithSpriteFrameName("TMS_DownloadButton.png"_spr);
     tpDownloadSpr->setScale(.325);
     tpDownload = CCMenuItemSpriteExtra::create(
         tpDownloadSpr,
         this,
-        menu_selector(TWSPackInfo::onDownload)
+        menu_selector(TMSPackInfo::onDownload)
     );
     buttonMenu->addChild(tpDownload);
     tpDownload->setPosition({ 321, 217 });
 
-    auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TWS_DeleteButton.png"_spr);
+    auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TMS_DeleteButton.png"_spr);
     tpDeleteSpr->setScale(.325);
     tpDelete = CCMenuItemSpriteExtra::create(
         tpDeleteSpr,
         this,
-        menu_selector(TWSPackInfo::onDelete)
+        menu_selector(TMSPackInfo::onDelete)
     );
     buttonMenu->addChild(tpDelete);
     tpDelete->setPosition({ 321, 217 });
@@ -129,7 +129,7 @@ bool TWSPackInfo::init(TWSPack* tp)
     return true;
 }
 
-void TWSPackInfo::onDownload(CCObject* sender) {
+void TMSPackInfo::onDownload(CCObject* sender) {
     //if (texturePack->isDownloading()) return;
     texturePack->downloadingIndicatorInfoPage->setVisible(true);
     tpDownload->setVisible(false);
@@ -137,7 +137,7 @@ void TWSPackInfo::onDownload(CCObject* sender) {
     texturePack->downloadTP();
 }
 
-void TWSPackInfo::onDelete(CCObject* sender) {
+void TMSPackInfo::onDelete(CCObject* sender) {
     //if (texturePack->isDownloading()) return;
     geode::createQuickPopup(
         "Delete Pack",
@@ -162,7 +162,7 @@ void TWSPackInfo::onDelete(CCObject* sender) {
     );
 }
 
-void TWSPackInfo::updateDownloadStata() {
+void TMSPackInfo::updateDownloadStata() {
     if (texturePack->downloadSuccessful) {
         tpDownload->setVisible(false);
         texturePack->downloadingIndicatorInfoPage->setVisible(false);
@@ -175,7 +175,7 @@ void TWSPackInfo::updateDownloadStata() {
 }
 
 
-TWSPackInfo::~TWSPackInfo()
+TMSPackInfo::~TMSPackInfo()
 {
     texturePack->downloadingIndicatorInfoPage = nullptr;
     texturePack->info = nullptr;

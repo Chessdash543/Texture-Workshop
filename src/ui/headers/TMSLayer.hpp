@@ -6,9 +6,9 @@ using namespace geode::prelude;
 #include <Geode/loader/Event.hpp>
 #include <Geode/utils/async.hpp>
 
-#include "../../tps/headers/TWSPack.hpp"
+#include "../../tps/headers/TMSPack.hpp"
 
-class TWSLayer : public cocos2d::CCLayer, TextInputDelegate {
+class TMSLayer : public cocos2d::CCLayer, TextInputDelegate {
 protected:
     CCLayerGradient* m_background;
     void parseJson(std::string str);
@@ -42,16 +42,16 @@ protected:
 
     virtual void textChanged(CCTextInputNode* p0);
 
-    ~TWSLayer();
+    ~TMSLayer();
     
 public:
-    static TWSLayer* create();
+    static TMSLayer* create();
     static cocos2d::CCScene* scene();
-    static inline TWSLayer* get = nullptr;
+    static inline TMSLayer* get = nullptr;
     bool init();
     
 
-    std::vector<TWSPack*> tps = {};
+    std::vector<TMSPack*> tps = {};
 
     void onClose(CCObject*);
     void searchTPs();
@@ -62,10 +62,8 @@ public:
     void setupTPCells(const matjson::Value& pageSubset);
 
     void onDiscord(CCObject*);
-    void onSupport(CCObject*);
     void onPacksFolder(CCObject*);
     void onRefresh(CCObject*);
-    void onCredits(CCObject*);
     void onRefreshSearch(CCObject*);
     void onSearch(CCObject*);
     void onFilter(CCObject*);

@@ -23,12 +23,11 @@
 - New API Endpoint again (https://textureworkshop.xyz/)
 - Edited the mod's description
 - Bumped dependency versions
-### !! IF YOU USE TWS, PLEASE UPDATE TO THIS VERSION !!
-Huge thanks to M336 for being our host until this update, it means alot to us. Without you, TWS wouldn't be what it is today. Thank you, M336 <3
+### !! IF YOU USE TMS, PLEASE UPDATE TO THIS VERSION !!
 
 # 1.4.0
 - New API Endpoint (https://tws.m336.dev)
-### !! IF YOU USE TWS, PLEASE UPDATE TO THIS VERSION !!
+### !! IF YOU USE TMS, PLEASE UPDATE TO THIS VERSION !!
 
 # 1.3.6
 - MacOS Support
@@ -44,11 +43,10 @@ Huge thanks to M336 for being our host until this update, it means alot to us. W
 - Fixed being able to download a pack twice
 - Fixed missing Cert Verification toggle while getting the index
 - Added a User Agent
-(This update wouldn't be possible without M336 and TheSillyDoggos contributions, Thank You!)
 
 # 1.3.3
-- Animated Background (Thanks ShineUA and Alphalaneous!)
-- New Server (Thanks M336!)
+- Animated Background
+- New Server
   
 # 1.3.2
 - Fix crash on pretty much doing anything that calls onGetTPsFinished

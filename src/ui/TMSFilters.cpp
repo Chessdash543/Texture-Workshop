@@ -1,10 +1,10 @@
-#include "./headers/TWSFilters.hpp"
-#include "./headers/TWSLayer.hpp"
+#include "./headers/TMSFilters.hpp"
+#include "./headers/TMSLayer.hpp"
 #include "../header/boobs.hpp"
 
-bool TWSFilters::init()
+bool TMSFilters::init()
 {
-    if (!Popup::init(120.f, 200.f, "TWS_Box.png"_spr))
+    if (!Popup::init(120.f, 200.f, "TMS_Box.png"_spr))
         return false;
 
     this->setTitle("Sort");
@@ -30,7 +30,7 @@ bool TWSFilters::init()
 
     featuredToggle = CCMenuItemToggler::createWithStandardSprites(
         this,
-        menu_selector(TWSFilters::onToggle),
+        menu_selector(TMSFilters::onToggle),
         1
     );
     menu->addChild(featuredToggle);
@@ -41,7 +41,7 @@ bool TWSFilters::init()
 
     downloadsToggle = CCMenuItemToggler::createWithStandardSprites(
         this,
-        menu_selector(TWSFilters::onToggle),
+        menu_selector(TMSFilters::onToggle),
         1
     );
     menu->addChild(downloadsToggle);
@@ -51,7 +51,7 @@ bool TWSFilters::init()
 
     recentToggle = CCMenuItemToggler::createWithStandardSprites(
         this,
-        menu_selector(TWSFilters::onToggle),
+        menu_selector(TMSFilters::onToggle),
         1
     );
     menu->addChild(recentToggle);
@@ -62,7 +62,7 @@ bool TWSFilters::init()
 
     imListeningToTheFilters = this->listenForClose().listen([this] {
         if (boobs::downloadsSort != oldDownloadsValue || boobs::recentlyUpdatedSort != oldRecentValue || boobs::featuredSort != oldFeaturedValue) {
-            TWSLayer::get->getTexturePacks(boobs::search);
+            TMSLayer::get->getTexturePacks(boobs::search);
         }
         return ListenerResult::Propagate;
     }); // will this work? lets find out! IM ROLLING THE DICE CALL MY ASS CUPHEAD BOOYAH!
@@ -71,7 +71,7 @@ bool TWSFilters::init()
     return true;
 }
 
-void TWSFilters::onToggle(CCObject* sender) {
+void TMSFilters::onToggle(CCObject* sender) {
    switch (sender->getTag())
    {
    case 92210: // featured 

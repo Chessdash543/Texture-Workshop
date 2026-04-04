@@ -2,7 +2,7 @@
 
 using namespace geode::prelude;
 
-class TWSPack;
+class TMSPack;
 
 class boobs {
     public:
@@ -18,5 +18,5 @@ class boobs {
         inline static bool recentlyUpdatedSort = false;
         inline static bool featuredSort = false;
         
-        inline static std::vector<TWSPack*> downloading = { };
+        inline static std::vector<TMSPack*> downloading = { };
 };

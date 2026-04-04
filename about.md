@@ -19,13 +19,3 @@ go to the **#texture-packs forum channel** and **read FAQ**, then create a post 
 - Game Version
 
 And that's about it! Wait until a **Texture Pack Mod** reviews your texture pack, and if they approve, it will be added!
-
-## Credits
-- [Uproxide](user:25397826) (Code and everything else)
-- M336 (Server)
-- Alphalaneous, M336, TheSillyDoggo, ShineUA (Their PRs to TWS)
-- Riley (Emotional support)
-- Brift (Concept creator, sprites, and logo)
-- Dremsk1y_ (Sprites)
-- Jaid (Helped with the about.md || One of the main TP Mods)
-- Cheeseworks (john)

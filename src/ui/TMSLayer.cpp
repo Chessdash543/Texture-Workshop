@@ -1,10 +1,10 @@
 using namespace geode::prelude;
 
-#include "headers/TWSLayer.hpp"
-#include "headers/TWSPackCell.hpp"
-#include "../tps/headers/TWSPack.hpp"
+#include "headers/TMSLayer.hpp"
+#include "headers/TMSPackCell.hpp"
+#include "../tps/headers/TMSPack.hpp"
 #include "../header/boobs.hpp"
-#include "./headers/TWSFilters.hpp"
+#include "./headers/TMSFilters.hpp"
 
 #include <cctype>
 #include <algorithm>
@@ -12,8 +12,8 @@ using namespace geode::prelude;
 #include <Geode/ui/GeodeUI.hpp>
 #include <Geode/loader/Event.hpp>
 
-TWSLayer* TWSLayer::create() {
-    auto ret = new TWSLayer();
+TMSLayer* TMSLayer::create() {
+    auto ret = new TMSLayer();
     if (ret && ret->init()) {
         ret->autorelease();
         return ret;
@@ -22,18 +22,18 @@ TWSLayer* TWSLayer::create() {
     return nullptr;
 };
 
-CCScene* TWSLayer::scene() {
-    auto layer = TWSLayer::create();
+CCScene* TMSLayer::scene() {
+    auto layer = TMSLayer::create();
     auto scene = CCScene::create();
     scene->addChild(layer);
     return scene;
 }
 
-bool TWSLayer::init() {
+bool TMSLayer::init() {
     if(!CCLayer::init())
         return false;
 
-    setID("TWSLayer");
+    setID("TMSLayer");
 
     auto director = CCDirector::sharedDirector();
     auto winSize = director->getWinSize();
@@ -41,7 +41,7 @@ bool TWSLayer::init() {
     get = this;
 
     CCSprite* backSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
-    CCMenuItemSpriteExtra* backBtn = CCMenuItemSpriteExtra::create(backSpr, this, menu_selector(TWSLayer::onClose));
+    CCMenuItemSpriteExtra* backBtn = CCMenuItemSpriteExtra::create(backSpr, this, menu_selector(TMSLayer::onClose));
     backBtn->setID("back-button");
 
     CCMenu* backMenu = CCMenu::create();
@@ -59,7 +59,7 @@ bool TWSLayer::init() {
     m_background->setContentSize(CCDirector::get()->getWinSize());
     addChild(m_background, -3);
 
-    auto spriteTexture = CCSprite::create("TWS_Cubes.png"_spr);
+    auto spriteTexture = CCSprite::create("TMS_Cubes.png"_spr);
     spriteTexture->setAnchorPoint({0, 0});
 
     ccTexParams params = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
@@ -92,7 +92,7 @@ bool TWSLayer::init() {
     bg->setOpacity(135);
     bg->setPositionY(bg->getPositionY() - 15);
 
-    outline = CCSprite::createWithSpriteFrameName("TWS_Outline.png"_spr);
+    outline = CCSprite::createWithSpriteFrameName("TMS_Outline.png"_spr);
     outline->setID("outline");
     this->addChild(outline);
     outline->setPosition(winSize / 2);
@@ -109,7 +109,7 @@ bool TWSLayer::init() {
     nextPage = CCMenuItemSpriteExtra::create(
         nextPageSpr,
         this,
-        menu_selector(TWSLayer::onNextPage)
+        menu_selector(TMSLayer::onNextPage)
     );
     nextPage->setAnchorPoint({0, .5});
     pagesMenu->addChild(nextPage);
@@ -120,7 +120,7 @@ bool TWSLayer::init() {
     prevPage = CCMenuItemSpriteExtra::create(
         prevPageSpr,
         this,
-        menu_selector(TWSLayer::onPrevPage)
+        menu_selector(TMSLayer::onPrevPage)
     );
     prevPage->setAnchorPoint({1, .5});
     pagesMenu->addChild(prevPage);
@@ -140,57 +140,36 @@ bool TWSLayer::init() {
     auto discordButton = CCMenuItemSpriteExtra::create(
         discordSprite,
         this,
-        menu_selector(TWSLayer::onDiscord)
+        menu_selector(TMSLayer::onDiscord)
     );
     discordButton->setID("discord-button");
     buttonMenu->addChild(discordButton);
     discordButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 20));
 
-    auto supportSprite = CCSprite::createWithSpriteFrameName("geode.loader/gift.png");
-    auto supportButton = CCMenuItemSpriteExtra::create(
-        supportSprite,
-        this,
-        menu_selector(TWSLayer::onSupport)
-    );
-    supportButton->setID("support-button");
-    buttonMenu->addChild(supportButton);
-    supportButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 55));
-
-    auto creditsSprite = CCSprite::createWithSpriteFrameName("TWS_Credits.png"_spr);
-    creditsSprite->setScale(0.7);
-    auto creditsButton = CCMenuItemSpriteExtra::create(
-        creditsSprite,
-        this,
-        menu_selector(TWSLayer::onCredits)
-    );
-    creditsButton->setID("credits-button");
-    buttonMenu->addChild(creditsButton);
-    creditsButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 90));
-
-    auto refreshSpr = CCSprite::createWithSpriteFrameName("TWS_RefreshButton.png"_spr);
+    auto refreshSpr = CCSprite::createWithSpriteFrameName("TMS_RefreshButton.png"_spr);
     refreshSpr->setScale(0.8);
     refreshButton = CCMenuItemSpriteExtra::create(
         refreshSpr,
         this,
-        menu_selector(TWSLayer::onRefresh)
+        menu_selector(TMSLayer::onRefresh)
     );
     refreshButton->setID("refresh-button");
     buttonMenu->addChild(refreshButton);
     refreshButton->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 65));
     refreshButton->setVisible(false);
 
-    auto filesSpr = CCSprite::createWithSpriteFrameName("TWS_FileButton.png"_spr);
+    auto filesSpr = CCSprite::createWithSpriteFrameName("TMS_FileButton.png"_spr);
     filesSpr->setScale(0.8);
     auto filesBtn = CCMenuItemSpriteExtra::create(
         filesSpr,
         this,
-        menu_selector(TWSLayer::onPacksFolder)
+        menu_selector(TMSLayer::onPacksFolder)
     );
     filesBtn->setID("files-button");
     buttonMenu->addChild(filesBtn);
     filesBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));
 
-    /*auto buttonSpr1 = CCSprite::createWithSpriteFrameName("TWS_Button.png"_spr);
+    /*auto buttonSpr1 = CCSprite::createWithSpriteFrameName("TMS_Button.png"_spr);
     auto featuredSpr = CCSprite::createWithSpriteFrameName("GJ_sStarsIcon_001.png");
     buttonSpr1->addChild(featuredSpr);
     featuredSpr->setPosition(ccp(buttonSpr1->getContentSize().width / 2, buttonSpr1->getContentSize().height / 2));
@@ -198,7 +177,7 @@ bool TWSLayer::init() {
     auto featuredBtn = CCMenuItemSpriteExtra::create(
         buttonSpr1,
         this,
-        menu_selector(TWSLayer::onPacksFolder)
+        menu_selector(TMSLayer::onPacksFolder)
     );
     featuredBtn->setID("featured-button");
     buttonMenu->addChild(featuredBtn);
@@ -277,12 +256,12 @@ bool TWSLayer::init() {
     inp->addChild(inpMenu);
     
     
-    auto filterSpr = CCSprite::createWithSpriteFrameName("TWS_SearchButton.png"_spr);
+    auto filterSpr = CCSprite::createWithSpriteFrameName("TMS_SearchButton.png"_spr);
     filterSpr->setScale(0.9);
     auto filterBtn = CCMenuItemSpriteExtra::create(
         filterSpr,
         this,
-        menu_selector(TWSLayer::onSort)
+        menu_selector(TMSLayer::onSort)
     );
     inpMenu->addChild(filterBtn);
     inpMenu->setLayout(
@@ -296,7 +275,7 @@ bool TWSLayer::init() {
     return true;
 }
 
-void TWSLayer::getTexturePacks(std::string searchQuery) {
+void TMSLayer::getTexturePacks(std::string searchQuery) {
     if (scroll && scroll->m_contentLayer->getChildrenCount() > 0) 
         scroll->m_contentLayer->removeAllChildren();
 
@@ -375,7 +354,7 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
     );
 }
 
-void TWSLayer::getTexturePacksCount(std::string searchQuery) {
+void TMSLayer::getTexturePacksCount(std::string searchQuery) {
     // Since pagination is done client-side, we calculate page info from already loaded data
     if (!pageJson.isArray() || pageJson.size() == 0) {
         log::warn("No texture pack data available for pagination calculation");
@@ -414,7 +393,7 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
     log::info("Calculated pagination: Page {}/{} ({} total items)", boobs::page, totalPages, totalItems);
 }
 
-void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
+void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
     if (pagesMenu) pagesMenu->setVisible(true);
     int i = 0;
     scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
@@ -430,7 +409,7 @@ void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
     for (auto& tpObject : pageSubset) {
         bool featured = tpObject["packFeature"].asInt().unwrap() == 1;
 
-        TWSPack* tp = TWSPack::create(
+        TMSPack* tp = TMSPack::create(
             tpObject["packID"].asInt().unwrap(),
             tpObject["packName"].asString().unwrap(),
             tpObject["downloadLink"].asString().unwrap(),
@@ -447,15 +426,15 @@ void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
 
         stupid = !stupid;
 
-        TWSPack* existingTp = nullptr;
+        TMSPack* existingTp = nullptr;
         for (auto* downloadingTp : boobs::downloading) {
             if (downloadingTp && downloadingTp->ID == tpObject["packID"].asInt().unwrap()) {
                 existingTp = downloadingTp;
             }
         }
 
-        TWSPackCell* tpCell = existingTp ? TWSPackCell::create(existingTp, stupid)
-                                         : TWSPackCell::create(tp, stupid);
+        TMSPackCell* tpCell = existingTp ? TMSPackCell::create(existingTp, stupid)
+                                         : TMSPackCell::create(tp, stupid);
 
         scroll->m_contentLayer->addChild(tpCell);
         tpCell->setPosition(0, 314 - (35 * i));
@@ -472,46 +451,25 @@ void TWSLayer::setupTPCells(const matjson::Value& pageSubset) {
     scroll->moveToTop();
 }
 
-void TWSLayer::onClose(CCObject*) {
+void TMSLayer::onClose(CCObject*) {
     auto mainMenu = MenuLayer::scene(false);
     CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(0.5f, mainMenu));
 }
 
-void TWSLayer::onDiscord(CCObject*) {
+void TMSLayer::onDiscord(CCObject*) {
     utils::web::openLinkInBrowser("https://discord.gg/pUGPY9hQ22");
 }
 
-void TWSLayer::onSupport(CCObject*) {
-    geode::createQuickPopup(
-        "Support Me",
-        "This mod tragically costs money to host and maintain cause storage is EXPENSIVE! GOD!\nHowever, if you enjoy TWS and want to support its development, consider supporting us on ko-fi for some cool perks!",
-        "No Thanks", "Ok",
-        [](auto, bool btn2) {
-            if (btn2) {
-                utils::web::openLinkInBrowser("https://ko-fi.com/teamsillywillies");
-            }
-        }
-    );
-}
-
-void TWSLayer::onCredits(CCObject*) {
-    FLAlertLayer::create(
-        "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA, Alphalaneous and TheSillyDoggo</c> - Pull Requests :3\n<cr>M336</c> - Serverside Code\n<cl>Brift</c> - Main Sprite Creator\n<cl>Dremsk1y</c> - Sprites\n<cp>Riley</c> - she spenda the money (hosting)",
-        "Ok"
-    )->show();
-}
-
-void TWSLayer::onRefresh(CCObject*) {
+void TMSLayer::onRefresh(CCObject*) {
     // deprecated
 }
 
-void TWSLayer::onPacksFolder(CCObject*) {
+void TMSLayer::onPacksFolder(CCObject*) {
     utils::file::openFolder(Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir());
 }
 
 // prev/next page of texture packs
-void TWSLayer::onPrevPage(CCObject*) {
+void TMSLayer::onPrevPage(CCObject*) {
     if (boobs::page == 1) {
         return;
     }
@@ -521,41 +479,41 @@ void TWSLayer::onPrevPage(CCObject*) {
     getTexturePacksCount(boobs::search);
 }
 
-void TWSLayer::onNextPage(CCObject*) {
+void TMSLayer::onNextPage(CCObject*) {
     boobs::page += 1;
     getTexturePacks(boobs::search);
     getTexturePacksCount(boobs::search);
 }
 
-void TWSLayer::onSort(CCObject*) {
-    auto sortPopup = TWSFilters::create();
+void TMSLayer::onSort(CCObject*) {
+    auto sortPopup = TMSFilters::create();
     sortPopup->show();
 }
 
-void TWSLayer::onSearch(CCObject*) {
+void TMSLayer::onSearch(CCObject*) {
     boobs::search = inp->getString();
     boobs::page = 1;
     getTexturePacks(boobs::search);
     getTexturePacksCount(boobs::search);
 }
 
-void TWSLayer::keyBackClicked() {
+void TMSLayer::keyBackClicked() {
     onClose(nullptr);
 }
 
-void TWSLayer::textChanged(CCTextInputNode*) {
+void TMSLayer::textChanged(CCTextInputNode*) {
     boobs::search = inp->getString();
 
-    this->unschedule(schedule_selector(TWSLayer::doThingIdrk));
-    this->scheduleOnce(schedule_selector(TWSLayer::doThingIdrk), 1.5f);
+    this->unschedule(schedule_selector(TMSLayer::doThingIdrk));
+    this->scheduleOnce(schedule_selector(TMSLayer::doThingIdrk), 1.5f);
 }
 
-void TWSLayer::doThingIdrk(float) {
+void TMSLayer::doThingIdrk(float) {
     getTexturePacks(boobs::search);
     getTexturePacksCount(boobs::search);
 }
 
-TWSLayer::~TWSLayer()
+TMSLayer::~TMSLayer()
 {
     //boobs::search = "";
     boobs::page = 1;

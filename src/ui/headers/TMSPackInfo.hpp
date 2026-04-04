@@ -8,14 +8,14 @@
 #include <algorithm>
 #include <Geode/utils/file.hpp>
 
-#include "../../tps/headers/TWSPack.hpp"
+#include "../../tps/headers/TMSPack.hpp"
 
 using namespace geode::prelude;
 
-class TWSPackInfo : public Popup {
+class TMSPackInfo : public Popup {
 public:
-    static TWSPackInfo* create(TWSPack* tp) {
-        auto popup = new TWSPackInfo;
+    static TMSPackInfo* create(TMSPack* tp) {
+        auto popup = new TMSPackInfo;
         if (popup->init(tp)) {
             popup->autorelease();
             return popup;
@@ -32,12 +32,12 @@ public:
     CCMenuItemSpriteExtra* tpDownload;
     CCMenuItemSpriteExtra* tpDelete;
 
-    TWSPack* texturePack;
+    TMSPack* texturePack;
 
-    ~TWSPackInfo();
+    ~TMSPackInfo();
 
 protected:
-    bool init(TWSPack* tp);
+    bool init(TMSPack* tp);
 
     void onDownload(CCObject* sender);
     void onDelete(CCObject* sender);

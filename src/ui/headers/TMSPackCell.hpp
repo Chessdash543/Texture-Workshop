@@ -8,14 +8,14 @@
 #include <algorithm>
 #include <Geode/utils/file.hpp>
 
-#include "../../tps/headers/TWSPack.hpp"
+#include "../../tps/headers/TMSPack.hpp"
 
 using namespace geode::prelude;
 
-class TWSPackCell : public CCLayerColor {
+class TMSPackCell : public CCLayerColor {
     public:
 
-        TWSPack* texturePack;
+        TMSPack* texturePack;
 
         // texture pack info, hey guys its me uproxide this is my awesome comment
         geode::LazySprite* icon;
@@ -31,8 +31,8 @@ class TWSPackCell : public CCLayerColor {
         CCMenu* pagesMenu;
         TextInput* inp;
 
-        static TWSPackCell* create(TWSPack* tp, bool other) {
-            TWSPackCell* pRet = new TWSPackCell();
+        static TMSPackCell* create(TMSPack* tp, bool other) {
+            TMSPackCell* pRet = new TMSPackCell();
             if (pRet && pRet->init(tp, other)) {
                 pRet->autorelease();
                 return pRet;
@@ -42,7 +42,7 @@ class TWSPackCell : public CCLayerColor {
             }
         }
 
-        ~TWSPackCell()
+        ~TMSPackCell()
         {
             if (texturePack) {
                 texturePack->cell = nullptr;
@@ -55,7 +55,7 @@ class TWSPackCell : public CCLayerColor {
         // id change it to "updateDownloadState" but its funnier to keep it as stata so its staying
     
     protected:
-        bool init(TWSPack* tp, bool other);
+        bool init(TMSPack* tp, bool other);
 
         void onInfo(CCObject*);
         void onCreator(CCObject*);

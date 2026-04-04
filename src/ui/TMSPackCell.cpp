@@ -1,8 +1,8 @@
-#include "./headers/TWSPackCell.hpp"
-#include "./headers/TWSPackInfo.hpp"
+#include "./headers/TMSPackCell.hpp"
+#include "./headers/TMSPackInfo.hpp"
 #include "../header/boobs.hpp"
 
-bool TWSPackCell::init(TWSPack* tp, bool other) {
+bool TMSPackCell::init(TMSPack* tp, bool other) {
     if (!CCLayerColor::init())
         return false;
 
@@ -48,7 +48,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     icon->setZOrder(1);
 
     if (texturePack->featured) {
-        auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
+        auto featuredSpr = CCSprite::createWithSpriteFrameName("TMS_Featured.png"_spr);
         featuredSpr->setScale(0.35);
         featuredSpr->setPosition({ 18, this->getContentSize().height / 2 });
         this->addChild(featuredSpr);
@@ -89,34 +89,34 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     buttonMenu->setAnchorPoint(ccp(0, 1));
     buttonMenu->setPosition(0,0);
 
-    auto tpInfoSpr = CCSprite::createWithSpriteFrameName("TWS_InfoButton.png"_spr);
+    auto tpInfoSpr = CCSprite::createWithSpriteFrameName("TMS_InfoButton.png"_spr);
     tpInfoSpr->setScale(.2);
     auto tpInfoPage = CCMenuItemSpriteExtra::create(
         tpInfoSpr,
         this,
-        menu_selector(TWSPackCell::onInfo)
+        menu_selector(TMSPackCell::onInfo)
     );
     
     this->addChild(buttonMenu);
     buttonMenu->addChild(tpInfoPage);
     tpInfoPage->setPosition(ccp(nameLabel->getPosition().x + nameLabel->getScaledContentWidth() + 6, 25.5));
 
-    auto tpDownloadSpr = CCSprite::createWithSpriteFrameName("TWS_DownloadButton.png"_spr);
+    auto tpDownloadSpr = CCSprite::createWithSpriteFrameName("TMS_DownloadButton.png"_spr);
     tpDownloadSpr->setScale(.65);
     tpDownload = CCMenuItemSpriteExtra::create(
         tpDownloadSpr,
         this,
-        menu_selector(TWSPackCell::onDownload)
+        menu_selector(TMSPackCell::onDownload)
     );
     buttonMenu->addChild(tpDownload);
     tpDownload->setPosition({ 288, this->getContentHeight() / 2 });
 
-    auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TWS_DeleteButton.png"_spr);
+    auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TMS_DeleteButton.png"_spr);
     tpDeleteSpr->setScale(.65);
     tpDelete = CCMenuItemSpriteExtra::create(
         tpDeleteSpr,
         this,
-        menu_selector(TWSPackCell::onDelete)
+        menu_selector(TMSPackCell::onDelete)
     );
     buttonMenu->addChild(tpDelete);
     tpDelete->setPosition({ 288, this->getContentHeight() / 2 });
@@ -158,16 +158,16 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     return true;
 };
 
-void TWSPackCell::onInfo(CCObject*) {
-    TWSPackInfo::create(texturePack)->show();
+void TMSPackCell::onInfo(CCObject*) {
+    TMSPackInfo::create(texturePack)->show();
 }
 
-void TWSPackCell::onDownload(CCObject*) {
+void TMSPackCell::onDownload(CCObject*) {
     texturePack->downloadTP();
     updateDownloadStata();
 }
 
-void TWSPackCell::onDelete(CCObject*) {
+void TMSPackCell::onDelete(CCObject*) {
     geode::createQuickPopup(
         "Delete Pack",
         fmt::format("Are you sure you want to delete {}?", texturePack->TPName),
@@ -188,7 +188,7 @@ void TWSPackCell::onDelete(CCObject*) {
     );
 }
 
-void TWSPackCell::updateDownloadStata() { // stata :joy:
+void TMSPackCell::updateDownloadStata() { // stata :joy:
     if (!texturePack) return;
 
     if (texturePack->isDownloading) {

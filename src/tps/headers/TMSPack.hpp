@@ -3,13 +3,13 @@
 
 using namespace geode::prelude;
 
-class TWSPackCell;
-class TWSPackInfo;
+class TMSPackCell;
+class TMSPackInfo;
 
-class TWSPack : public cocos2d::CCObject {
+class TMSPack : public cocos2d::CCObject {
     public:
-        TWSPackCell* cell = nullptr;
-        TWSPackInfo* info = nullptr;
+        TMSPackCell* cell = nullptr;
+        TMSPackInfo* info = nullptr;
 
         std::string TPName, DownloadURL, IconURL, TPDescription, TPCreator, TPVersion, GDVersion;
         int ID, downloads;
@@ -18,8 +18,8 @@ class TWSPack : public cocos2d::CCObject {
         Slider* downloadingIndicator = nullptr;
         Slider* downloadingIndicatorInfoPage = nullptr;
 
-        static TWSPack* create(int id, std::string name, std::string downloadURL, std::string iconURL, std::string description, std::string creator, std::string version, std::string gdVersion, bool isFeatured, int downloads) {
-            auto tp = new TWSPack();
+        static TMSPack* create(int id, std::string name, std::string downloadURL, std::string iconURL, std::string description, std::string creator, std::string version, std::string gdVersion, bool isFeatured, int downloads) {
+            auto tp = new TMSPack();
 
             tp->ID = id;
             tp->TPName = name;
