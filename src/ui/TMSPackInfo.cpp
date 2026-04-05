@@ -1,6 +1,12 @@
 #include "./headers/TMSPackInfo.hpp"
 #include "./headers/TMSPackCell.hpp"
 
+static std::string formatTPVersion(const std::string& version) {
+    if (version.empty() || version[0] == 'v')
+        return version;
+    return "v" + version;
+}
+
 bool TMSPackInfo::init(TMSPack* tp)
 {
     if (!Popup::init(335.f, 231.f, "TMS_Box.png"_spr))
@@ -70,7 +76,7 @@ bool TMSPackInfo::init(TMSPack* tp)
     creatorLabel->setZOrder(1);
     this->m_mainLayer->addChild(creatorLabel);
 
-    versionLabel = CCLabelBMFont::create(fmt::format("v{}", tp->TPVersion).c_str(), "bigFont.fnt");
+    versionLabel = CCLabelBMFont::create(formatTPVersion(tp->TPVersion).c_str(), "bigFont.fnt");
     versionLabel->setScale(0.3);
     versionLabel->setAnchorPoint(ccp(0, 1));
     versionLabel->setPosition({76.5, 183.5}); // OH BOY I LOVE HARDCODING!

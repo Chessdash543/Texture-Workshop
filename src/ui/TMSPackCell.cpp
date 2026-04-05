@@ -2,6 +2,12 @@
 #include "./headers/TMSPackInfo.hpp"
 #include "../header/boobs.hpp"
 
+static std::string formatTPVersion(const std::string& version) {
+    if (version.empty() || version[0] == 'v')
+        return version;
+    return "v" + version;
+}
+
 bool TMSPackCell::init(TMSPack* tp, bool other) {
     if (!CCLayerColor::init())
         return false;
@@ -62,11 +68,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     nameLabel->setZOrder(1);
     this->addChild(nameLabel);
 
-    std::string versionStr = tp->TPVersion;
-    if (versionStr.empty() || versionStr[0] != 'v') {
-        versionStr = "v" + versionStr;
-    }
-    versionLabel = CCLabelBMFont::create(versionStr.c_str(), "bigFont.fnt");
+    versionLabel = CCLabelBMFont::create(formatTPVersion(tp->TPVersion).c_str(), "bigFont.fnt");
     versionLabel->setScale(0.2);
     versionLabel->setAnchorPoint(ccp(0, 1));
     versionLabel->setPosition({35.5, 12}); // OH BOY I LOVE HARDCODING!
