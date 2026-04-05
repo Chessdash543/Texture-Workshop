@@ -297,7 +297,7 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
     }
 
     matjson::Value packsArray = matjson::Value::array();
-    for (auto& [key, value] : fullJson.unwrap().as_object().unwrap()) {
+    for (auto& [key, value] : fullJson.unwrap().asObject().unwrap()) {
         packsArray.push(value);
     }
 
