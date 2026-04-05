@@ -268,10 +268,9 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
         outline->removeChild(errorSlop, true);
     }
 
-    // Load local test.json
     auto jsonResult = geode::utils::file::readString("test.json");
     if (!jsonResult) {
-        log::error("Failed to read test.json: {}", jsonResult.err());
+        log::error("Failed to read test.json");
         auto errorText = CCLabelBMFont::create("Failed to load texture packs data!", "bigFont.fnt");
         outline->addChild(errorText);
         errorText->setScale(0.3);
@@ -285,7 +284,7 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
 
     auto fullJson = matjson::parse(jsonResult.unwrap());
     if (!fullJson) {
-        log::error("Failed to parse test.json: {}", fullJson.err());
+        log::error("Failed to parse test.json");
         auto errorText = CCLabelBMFont::create("Failed to parse texture packs data!", "bigFont.fnt");
         outline->addChild(errorText);
         errorText->setScale(0.3);
@@ -298,7 +297,7 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
     }
 
     matjson::Value packsArray = matjson::Value::array();
-    for (auto& [key, value] : fullJson.unwrap().asObject().unwrap()) {
+    for (auto& [key, value] : fullJson.unwrap().as_object().unwrap()) {
         packsArray.push(value);
     }
 
