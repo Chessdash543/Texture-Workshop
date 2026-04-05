@@ -449,7 +449,7 @@ void TMSLayer::onClose(CCObject*) {
 }
 
 void TMSLayer::onDiscord(CCObject*) {
-    utils::web::openLinkInBrowser("https://discord.gg/pUGPY9hQ22");
+    utils::web::openLinkInBrowser("https://discord.gg/YMGPn26WMN");
 }
 
 void TMSLayer::onRefresh(CCObject*) {
