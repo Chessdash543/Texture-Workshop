@@ -268,91 +268,82 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
         outline->removeChild(errorSlop, true);
     }
 
-    auto jsonResult = geode::utils::file::readString("test.json");
-    if (!jsonResult) {
-        log::error("Failed to read test.json");
-        auto errorText = CCLabelBMFont::create("Failed to load texture packs data!", "bigFont.fnt");
-        outline->addChild(errorText);
-        errorText->setScale(0.3);
-        errorText->setID("error-text"_spr);
-        errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
-        loading->setVisible(false);
-        nextPage->setVisible(false);
-        prevPage->setVisible(false);
-        return;
-    }
+    auto req = geode::utils::web::WebRequest();
 
-    auto fullJson = matjson::parse(jsonResult.unwrap());
-    if (!fullJson) {
-        log::error("Failed to parse test.json");
-        auto errorText = CCLabelBMFont::create("Failed to parse texture packs data!", "bigFont.fnt");
-        outline->addChild(errorText);
-        errorText->setScale(0.3);
-        errorText->setID("error-text"_spr);
-        errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
-        loading->setVisible(false);
-        nextPage->setVisible(false);
-        prevPage->setVisible(false);
-        return;
-    }
+    std::string url = "https://texture-makers-server.vercel.app/data/tms.json";
 
-    matjson::Value packsArray = matjson::Value::array();
-    for (auto& [key, value] : fullJson.unwrap().asObject().unwrap()) {
-        packsArray.push(value);
-    }
+    log::debug("Fetching texture packs from: {}", url);
 
-    // Filter if search query is provided
-    if (!searchQuery.empty()) {
-        matjson::Value filtered = matjson::Value::array();
-        std::string lowerQuery = searchQuery;
-        std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
-        for (auto& pack : packsArray) {
-            std::string name = pack["packName"].asString().unwrapOr("");
-            std::string desc = pack["packDescription"].asString().unwrapOr("");
-            std::string lowerName = name;
-            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
-            std::string lowerDesc = desc;
-            std::transform(lowerDesc.begin(), lowerDesc.end(), lowerDesc.begin(), ::tolower);
-            if (lowerName.find(lowerQuery) != std::string::npos || lowerDesc.find(lowerQuery) != std::string::npos) {
-                filtered.push(pack);
+    m_getTPslistener.spawn( 
+        req.get(url),
+        [this, searchQuery](geode::utils::web::WebResponse res) {
+            if (res.ok()) {
+                pageJson = res.json().unwrap();
+
+                // Filter locally if search query is provided
+                if (!searchQuery.empty()) {
+                    matjson::Value filtered = matjson::Value::array();
+                    std::string lowerQuery = searchQuery;
+                    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
+                    for (auto& pack : pageJson) {
+                        std::string name = pack["packName"].asString().unwrapOr("");
+                        std::string desc = pack["packDescription"].asString().unwrapOr("");
+                        std::string lowerName = name;
+                        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+                        std::string lowerDesc = desc;
+                        std::transform(lowerDesc.begin(), lowerDesc.end(), lowerDesc.begin(), ::tolower);
+                        if (lowerName.find(lowerQuery) != std::string::npos || lowerDesc.find(lowerQuery) != std::string::npos) {
+                            filtered.push(pack);
+                        }
+                    }
+                    pageJson = filtered;
+                }
+
+                if (pageJson.size() == 0) {
+                    auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
+                    outline->addChild(errorText);
+                    errorText->setScale(0.3);
+                    errorText->setID("error-text"_spr);
+                    errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
+                    loading->setVisible(false);
+                    nextPage->setVisible(false);
+                    prevPage->setVisible(false);
+                    return;
+                }
+
+                // PAGINAÇÃO LOCAL
+                int itemsPerPage = 10;
+                int start = (boobs::page - 1) * itemsPerPage;
+                int end = std::min(start + itemsPerPage, (int)pageJson.size());
+
+                if (start >= pageJson.size()) {
+                    // Página fora do alcance
+                    nextPage->setVisible(false);
+                    prevPage->setVisible(boobs::page > 1);
+                    loading->setVisible(false);
+                    return;
+                }
+
+                matjson::Value pageSubset = matjson::Value::array();
+                for (int i = start; i < end; i++) {
+                    pageSubset.push(pageJson[i]);
+                }
+
+                setupTPCells(pageSubset); // chama a função nova com o subset da página
+
+            } else {
+                log::error("Failed to fetch texture packs (HTTP {})", res.code());
+                auto errorText = CCLabelBMFont::create("Something went wrong while getting TPs!\nPlease try again later.", "bigFont.fnt");
+                outline->addChild(errorText);
+                errorText->setScale(0.3);
+                errorText->setID("error-text"_spr);
+                errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
+                loading->setVisible(false);
+                nextPage->setVisible(false);
+                prevPage->setVisible(false);
             }
         }
-        packsArray = filtered;
-    }
-
-    pageJson = packsArray;
-
-    if (pageJson.size() == 0) {
-        auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
-        outline->addChild(errorText);
-        errorText->setScale(0.3);
-        errorText->setID("error-text"_spr);
-        errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
-        loading->setVisible(false);
-        nextPage->setVisible(false);
-        prevPage->setVisible(false);
-        return;
-    }
-
-    // PAGINAÇÃO LOCAL
-    int itemsPerPage = 10;
-    int start = (boobs::page - 1) * itemsPerPage;
-    int end = std::min(start + itemsPerPage, (int)pageJson.size());
-
-    if (start >= pageJson.size()) {
-        // Página fora do alcance
-        nextPage->setVisible(false);
-        prevPage->setVisible(boobs::page > 1);
-        loading->setVisible(false);
-        return;
-    }
-
-    matjson::Value pageSubset = matjson::Value::array();
-    for (int i = start; i < end; i++) {
-        pageSubset.push(pageJson[i]);
-    }
-
-    setupTPCells(pageSubset); // chama a função nova com o subset da página
+    );
 }
 
 void TMSLayer::getTexturePacksCount(std::string searchQuery) {
