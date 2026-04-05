@@ -251,26 +251,8 @@ bool TMSLayer::init() {
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
 
-    /*auto inpMenu = CCMenu::create();
-    inpMenu->setContentSize(inp->getContentSize());
-    inp->addChild(inpMenu);
-    
-    
-    auto filterSpr = CCSprite::createWithSpriteFrameName("TMS_SearchButton.png"_spr);
-    filterSpr->setScale(0.9);
-    auto filterBtn = CCMenuItemSpriteExtra::create(
-        filterSpr,
-        this,
-        menu_selector(TMSLayer::onSort)
-    );
-    inpMenu->addChild(filterBtn);
-    inpMenu->setLayout(
-        RowLayout::create()
-            ->setAxisAlignment(AxisAlignment::End)
-    );
-    inpMenu->setPosition(inp->getContentSize() / 2);
-    filterBtn->setPositionX(filterBtn->getPositionX() + 5);
-    inpMenu->setTouchPriority(-129);*/
+    inputText = "";
+    this->schedule(schedule_selector(TMSLayer::doThingIdrk), 0.5f);
 
     return true;
 }
@@ -503,14 +485,22 @@ void TMSLayer::keyBackClicked() {
 
 void TMSLayer::textChanged(CCTextInputNode*) {
     boobs::search = inp->getString();
-
-    this->unschedule(schedule_selector(TMSLayer::doThingIdrk));
-    this->scheduleOnce(schedule_selector(TMSLayer::doThingIdrk), 1.5f);
 }
 
 void TMSLayer::doThingIdrk(float) {
+    if (!inp) {
+        return;
+    }
+
+    auto currentSearch = inp->getString();
+    if (currentSearch == inputText) {
+        return;
+    }
+
+    inputText = currentSearch;
+    boobs::search = currentSearch;
+    boobs::page = 1;
     getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
 }
 
 TMSLayer::~TMSLayer()
