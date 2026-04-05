@@ -135,6 +135,7 @@ bool TMSLayer::init() {
     
     buttonMenu->setPosition(0, 0);
     buttonMenu->setContentSize(winSize);
+    buttonMenu->setTouchPriority(-129);
 
     auto discordSprite = CCSprite::createWithSpriteFrameName("gj_discordIcon_001.png");
     auto discordButton = CCMenuItemSpriteExtra::create(
@@ -251,17 +252,16 @@ bool TMSLayer::init() {
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
 
-    /*auto inpMenu = CCMenu::create();
+    auto inpMenu = CCMenu::create();
     inpMenu->setContentSize(inp->getContentSize());
     inp->addChild(inpMenu);
-    
-    
+
     auto filterSpr = CCSprite::createWithSpriteFrameName("TMS_SearchButton.png"_spr);
     filterSpr->setScale(0.9);
     auto filterBtn = CCMenuItemSpriteExtra::create(
         filterSpr,
         this,
-        menu_selector(TMSLayer::onSort)
+        menu_selector(TMSLayer::onSearch)
     );
     inpMenu->addChild(filterBtn);
     inpMenu->setLayout(
@@ -270,7 +270,7 @@ bool TMSLayer::init() {
     );
     inpMenu->setPosition(inp->getContentSize() / 2);
     filterBtn->setPositionX(filterBtn->getPositionX() + 5);
-    inpMenu->setTouchPriority(-129);*/
+    inpMenu->setTouchPriority(-129);
 
     return true;
 }
@@ -338,6 +338,7 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
                 }
 
                 setupTPCells(pageSubset); // chama a função nova com o subset da página
+                getTexturePacksCount(boobs::search);
 
             } else {
                 log::error("Failed to fetch texture packs (HTTP {})", res.code());
@@ -494,7 +495,6 @@ void TMSLayer::onSearch(CCObject*) {
     boobs::search = inp->getString();
     boobs::page = 1;
     getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
 }
 
 void TMSLayer::keyBackClicked() {
@@ -503,6 +503,7 @@ void TMSLayer::keyBackClicked() {
 
 void TMSLayer::textChanged(CCTextInputNode*) {
     boobs::search = inp->getString();
+    boobs::page = 1;
 
     this->unschedule(schedule_selector(TMSLayer::doThingIdrk));
     this->scheduleOnce(schedule_selector(TMSLayer::doThingIdrk), 1.5f);
@@ -510,7 +511,6 @@ void TMSLayer::textChanged(CCTextInputNode*) {
 
 void TMSLayer::doThingIdrk(float) {
     getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
 }
 
 TMSLayer::~TMSLayer()
