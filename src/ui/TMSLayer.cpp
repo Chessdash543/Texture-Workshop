@@ -311,6 +311,22 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
                     return;
                 }
 
+                // Ordena featured primeiro e depois não featured
+                {
+                    matjson::Value sorted = matjson::Value::array();
+                    for (auto& pack : pageJson) {
+                        if (pack["packFeature"].asInt().unwrap() == 1) {
+                            sorted.push(pack);
+                        }
+                    }
+                    for (auto& pack : pageJson) {
+                        if (pack["packFeature"].asInt().unwrap() != 1) {
+                            sorted.push(pack);
+                        }
+                    }
+                    pageJson = sorted;
+                }
+
                 // PAGINAÇÃO LOCAL
                 int itemsPerPage = 10;
                 int start = (boobs::page - 1) * itemsPerPage;
