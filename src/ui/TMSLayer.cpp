@@ -278,7 +278,21 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
         req.get(url),
         [this, searchQuery](geode::utils::web::WebResponse res) {
             if (res.ok()) {
-                pageJson = res.json().unwrap();
+                auto jsonResult = res.json();
+                if (!jsonResult.isOk()) {
+                    log::error("Failed to parse texture pack JSON");
+                    auto errorText = CCLabelBMFont::create("Failed to parse texture pack data!", "bigFont.fnt");
+                    outline->addChild(errorText);
+                    errorText->setScale(0.3);
+                    errorText->setID("error-text"_spr);
+                    errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
+                    loading->setVisible(false);
+                    nextPage->setVisible(false);
+                    prevPage->setVisible(false);
+                    return;
+                }
+
+                pageJson = jsonResult.unwrap();
 
                 // Filter locally if search query is provided
                 if (!searchQuery.empty()) {
