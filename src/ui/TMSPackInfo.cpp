@@ -13,6 +13,7 @@ bool TMSPackInfo::init(TMSPack* tp)
         return false;
 
     int reloadIconTries = 0;
+    int reloadThumbnailTries = 0;
 
     texturePack = tp;
     texturePack->info = this;
@@ -40,6 +41,31 @@ bool TMSPackInfo::init(TMSPack* tp)
     icon->setScale(0.6 * scale);
     icon->setPosition({ 45, 189.5 });
     icon->setZOrder(1);
+
+    // Add thumbnail if available
+    if (!tp->ThumbnailURL.empty()) {
+        LazySprite* thumbnail = LazySprite::create({320, 220});
+        thumbnail->setLoadCallback(
+            [this, &reloadThumbnailTries, tp, thumbnail](Result<> result) {
+                if (!result.isOk()) 
+                {
+                    if (reloadThumbnailTries < 3) {
+                        log::info("failed to load thumbnail, retrying... (attempt {}/3)", reloadThumbnailTries + 1); 
+                        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
+                        reloadThumbnailTries += 1;
+                    } else {
+                        log::error("failed to load thumbnail after 3 attempts, hiding thumbnail.");
+                        thumbnail->setVisible(false);
+                    }
+                }
+            }
+        );
+        this->m_mainLayer->addChild(thumbnail);
+        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
+        thumbnail->setScale(1.0f);
+        thumbnail->setPosition({ 167.5, 115 });
+        thumbnail->setZOrder(0);
+    }
 
     if (tp->featured) {
         auto featuredSpr = CCSprite::createWithSpriteFrameName("TMS_Featured.png"_spr);

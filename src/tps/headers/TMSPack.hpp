@@ -11,14 +11,14 @@ class TMSPack : public cocos2d::CCObject {
         TMSPackCell* cell = nullptr;
         TMSPackInfo* info = nullptr;
 
-        std::string TPName, DownloadURL, IconURL, TPDescription, TPCreator, TPVersion, GDVersion;
+        std::string TPName, DownloadURL, IconURL, TPDescription, TPCreator, TPVersion, GDVersion, ThumbnailURL;
         int ID, downloads;
         bool featured;
 
         Slider* downloadingIndicator = nullptr;
         Slider* downloadingIndicatorInfoPage = nullptr;
 
-        static TMSPack* create(int id, std::string name, std::string downloadURL, std::string iconURL, std::string description, std::string creator, std::string version, std::string gdVersion, bool isFeatured, int downloads) {
+        static TMSPack* create(int id, std::string name, std::string downloadURL, std::string iconURL, std::string description, std::string creator, std::string version, std::string gdVersion, bool isFeatured, int downloads, std::string thumbnailURL = "") {
             auto tp = new TMSPack();
 
             tp->ID = id;
@@ -31,7 +31,7 @@ class TMSPack : public cocos2d::CCObject {
             tp->GDVersion = gdVersion;
             tp->featured = isFeatured;
             tp->downloads = downloads;
-
+            tp->ThumbnailURL = thumbnailURL;
 
             return tp;
         };
