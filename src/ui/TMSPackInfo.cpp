@@ -12,8 +12,8 @@ bool TMSPackInfo::init(TMSPack* tp)
     if (!Popup::init(335.f, 231.f, "TMS_Box.png"_spr))
         return false;
 
-    int reloadIconTries = 0;
-    int reloadThumbnailTries = 0;
+    auto reloadIconTries = std::make_shared<int>(0);
+    auto reloadThumbnailTries = std::make_shared<int>(0);
 
     texturePack = tp;
     texturePack->info = this;
@@ -22,13 +22,13 @@ bool TMSPackInfo::init(TMSPack* tp)
 
     LazySprite* icon = LazySprite::create({100, 100});
     icon->setLoadCallback(
-        [this, &reloadIconTries, tp, icon](Result<> result) {
+        [this, reloadIconTries, tp, icon](Result<> result) {
             if (!result.isOk()) 
             {
-                if (reloadIconTries < 3) {
-                    log::info("failed to load icon, retrying... (attempt {}/3)", reloadIconTries + 1); 
+                if (*reloadIconTries < 3) {
+                    log::info("failed to load icon, retrying... (attempt {}/3)", *reloadIconTries + 1); 
                     icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
-                    reloadIconTries += 1;
+                    (*reloadIconTries) += 1;
                 } else {
                     log::error("failed to load icon after 3 attempts, hiding icon.");
                     icon->setVisible(false);
@@ -46,13 +46,13 @@ bool TMSPackInfo::init(TMSPack* tp)
     if (!tp->ThumbnailURL.empty()) {
         LazySprite* thumbnail = LazySprite::create({320, 220});
         thumbnail->setLoadCallback(
-            [this, &reloadThumbnailTries, tp, thumbnail](Result<> result) {
+            [this, reloadThumbnailTries, tp, thumbnail](Result<> result) {
                 if (!result.isOk()) 
                 {
-                    if (reloadThumbnailTries < 3) {
-                        log::info("failed to load thumbnail, retrying... (attempt {}/3)", reloadThumbnailTries + 1); 
+                    if (*reloadThumbnailTries < 3) {
+                        log::info("failed to load thumbnail, retrying... (attempt {}/3)", *reloadThumbnailTries + 1); 
                         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
-                        reloadThumbnailTries += 1;
+                        (*reloadThumbnailTries) += 1;
                     } else {
                         log::error("failed to load thumbnail after 3 attempts, hiding thumbnail.");
                         thumbnail->setVisible(false);
