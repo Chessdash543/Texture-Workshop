@@ -431,24 +431,17 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
     for (auto& tpObject : pageSubset) {
         bool featured = tpObject["packFeature"].asInt().unwrap() == 1;
 
-        auto makeUrl = [](const std::string& raw) {
-            if (raw.rfind("http://", 0) == 0 || raw.rfind("https://", 0) == 0) {
-                return raw;
-            }
-            return fmt::format("https://texture-makers-server.vercel.app{}", raw);
-        };
-
-        std::string iconURL = makeUrl(tpObject["packLogo"].asString().unwrap());
+        // Get thumbnail URL if available
         std::string thumbnailURL = "";
         if (tpObject.contains("packThumbnail") && tpObject["packThumbnail"].isString()) {
-            thumbnailURL = makeUrl(tpObject["packThumbnail"].asString().unwrap());
+            thumbnailURL = "https://texture-makers-server.vercel.app" + tpObject["packThumbnail"].asString().unwrap();
         }
 
         TMSPack* tp = TMSPack::create(
             tpObject["packID"].asInt().unwrap(),
             tpObject["packName"].asString().unwrap(),
             tpObject["downloadLink"].asString().unwrap(),
-            iconURL,
+            "https://texture-makers-server.vercel.app" + tpObject["packLogo"].asString().unwrap(),
             tpObject["packDescription"].asString().unwrap(),
             tpObject["packCreator"].asString().unwrap(),
             tpObject["packVersion"].asString().unwrap(),
