@@ -42,23 +42,9 @@ bool TMSPackInfo::init(TMSPack* tp)
     icon->setPosition({ 45, 189.5 });
     icon->setZOrder(1);
 
-    if (tp->featured) {
-        auto featuredSpr = CCSprite::createWithSpriteFrameName("TMS_Featured.png"_spr);
-        featuredSpr->setScale(0.6);
-        featuredSpr->setPosition({ 45, 189.5 });
-        this->m_mainLayer->addChild(featuredSpr);
-    }
-
-    auto line = CCSprite::createWithSpriteFrameName("floorLine_001.png");
-    this->m_mainLayer->addChild(line);
-    line->setPosition(this->m_mainLayer->getContentSize() / 2);
-    line->setPositionY(line->getPositionY() + 40);
-    line->setScale(0.675);
-
-    std::string fullDesc = fmt::format("# {}\n{}", tp->TPName, tp->TPDescription);
-
+    // Add thumbnail if available
     if (!tp->ThumbnailURL.empty()) {
-        LazySprite* thumbnail = LazySprite::create({300, 100});
+        LazySprite* thumbnail = LazySprite::create({320, 220});
         thumbnail->setLoadCallback(
             [this, &reloadThumbnailTries, tp, thumbnail](Result<> result) {
                 if (!result.isOk()) 
@@ -77,14 +63,29 @@ bool TMSPackInfo::init(TMSPack* tp)
         this->m_mainLayer->addChild(thumbnail);
         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
         thumbnail->setScale(1.0f);
-        thumbnail->setPosition({ 167.5, 140 });
+        thumbnail->setPosition({ 167.5, 115 });
         thumbnail->setZOrder(0);
     }
 
-    auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
+    if (tp->featured) {
+        auto featuredSpr = CCSprite::createWithSpriteFrameName("TMS_Featured.png"_spr);
+        featuredSpr->setScale(0.6);
+        featuredSpr->setPosition({ 45, 189.5 });
+        this->m_mainLayer->addChild(featuredSpr);
+    }
+
+    auto line = CCSprite::createWithSpriteFrameName("floorLine_001.png");
+    this->m_mainLayer->addChild(line);
+    line->setPosition(this->m_mainLayer->getContentSize() / 2);
+    line->setPositionY(line->getPositionY() + 40);
+    line->setScale(0.675);
+
+    std::string fullDesc = fmt::format("# {}\n{}", tp->TPName, tp->TPDescription);
+
+    auto desc = MDTextArea::create(fullDesc, ccp(300, 135));
     this->m_mainLayer->addChild(desc);
     desc->setPosition(line->getPosition());
-    desc->setPositionY(desc->getPositionY() - 95);
+    desc->setPositionY(desc->getPositionY() - 75);
 
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.5);
