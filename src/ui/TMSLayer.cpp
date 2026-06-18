@@ -232,8 +232,7 @@ bool TMSLayer::init() {
     boobs::search = "";
     boobs::page = 1;
 
-    getTexturePacks(boobs::search); // web web web sahur
-    getTexturePacksCount(boobs::search); // web web web sahur the 2
+    getTexturePacks(boobs::search);
 
     inp = TextInput::create(300, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
@@ -258,6 +257,8 @@ bool TMSLayer::init() {
 }
 
 void TMSLayer::getTexturePacks(std::string searchQuery) {
+    m_requestId++;
+
     if (scroll && scroll->m_contentLayer->getChildrenCount() > 0) 
         scroll->m_contentLayer->removeAllChildren();
 
@@ -274,9 +275,13 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
 
     log::debug("Fetching texture packs from: {}", url);
 
+    int currentRequestId = m_requestId;
+
     m_getTPslistener.spawn( 
         req.get(url),
-        [this, searchQuery](geode::utils::web::WebResponse res) {
+        [this, searchQuery, currentRequestId](geode::utils::web::WebResponse res) {
+            if (currentRequestId != m_requestId) return;
+
             if (res.ok()) {
                 pageJson = res.json().unwrap();
 
@@ -345,7 +350,8 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
                     pageSubset.push(pageJson[i]);
                 }
 
-                setupTPCells(pageSubset); // chama a função nova com o subset da página
+                setupTPCells(pageSubset);
+                getTexturePacksCount(searchQuery);
 
             } else {
                 log::error("Failed to fetch texture packs (HTTP {})", res.code());
@@ -419,7 +425,9 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
 
         // Get thumbnail URL if available
         std::string thumbnailURL = "";
-        if (tpObject.contains("packThumbnail") && tpObject["packThumbnail"].isString()) {
+        if (tpObject.contains("PackThumbnail") && tpObject["PackThumbnail"].isString()) {
+            thumbnailURL = "https://texture-makers-server.vercel.app" + tpObject["PackThumbnail"].asString().unwrap();
+        } else if (tpObject.contains("packThumbnail") && tpObject["packThumbnail"].isString()) {
             thumbnailURL = "https://texture-makers-server.vercel.app" + tpObject["packThumbnail"].asString().unwrap();
         }
 
@@ -433,7 +441,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
             tpObject["packVersion"].asString().unwrap(),
             tpObject["gdVersion"].asString().unwrap(),
             featured,
-            tpObject["packDownloads"].asInt().unwrap(),
+            tpObject["packDownloads"].asInt().unwrapOr(0),
             thumbnailURL
         );
 
@@ -491,13 +499,11 @@ void TMSLayer::onPrevPage(CCObject*) {
 
     boobs::page -= 1;
     getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
 }
 
 void TMSLayer::onNextPage(CCObject*) {
     boobs::page += 1;
     getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
 }
 
 void TMSLayer::onSort(CCObject*) {
@@ -509,7 +515,6 @@ void TMSLayer::onSearch(CCObject*) {
     boobs::search = inp->getString();
     boobs::page = 1;
     getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
 }
 
 void TMSLayer::keyBackClicked() {

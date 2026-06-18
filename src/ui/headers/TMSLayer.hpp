@@ -37,6 +37,7 @@ protected:
     LoadingCircleSprite* loading;
 
     matjson::Value pageJson;
+    int m_requestId = 0;
 
     //int page = 1;
 

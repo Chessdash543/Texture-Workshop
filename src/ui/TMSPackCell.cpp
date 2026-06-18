@@ -17,8 +17,6 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
 
     lighterColor = other;
 
-    int reloadIconTries = 0;
-
     if (lighterColor) {
         this->setOpacity(100);
     } else {
@@ -33,7 +31,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     // thank you geode lead developers for the awesome creation that is lazy sprite, i love you so much. mwah.
     icon = geode::LazySprite::create({100, 100});
     icon->setLoadCallback(
-        [this, &reloadIconTries, tp](Result<> result) {
+        [this, reloadIconTries = 0, tp](Result<> result) mutable {
             if (!result.isOk()) 
             {
                 if (reloadIconTries < 3) {
