@@ -64,7 +64,6 @@ bool TMSPackInfo::init(TMSPack* tp)
         auto clipNode = CCClippingNode::create(stencil);
         clipNode->setAlphaThreshold(0.5f);
         clipNode->setContentSize({thumbMaxW, thumbMaxH});
-        clipNode->setAnchorPoint({0.5, 0.5});
 
         LazySprite* thumbnail = LazySprite::create({thumbMaxW, thumbMaxH});
         thumbnail->setAnchorPoint({0, 0});
@@ -135,13 +134,13 @@ bool TMSPackInfo::init(TMSPack* tp)
         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
 
         this->m_mainLayer->addChild(clipNode);
-        clipNode->setPosition({167.5, 120});
+        clipNode->setPosition({27.5, 130});
     }
 
     auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
     this->m_mainLayer->addChild(desc);
     desc->setPosition(line->getPosition());
-    desc->setPositionY(desc->getPositionY() - 125);
+    desc->setPositionY(desc->getPositionY() - 95);
 
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.5);
