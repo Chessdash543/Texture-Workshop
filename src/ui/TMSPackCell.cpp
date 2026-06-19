@@ -24,7 +24,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     }
 
     const float OLD_H = 35;
-    const float THUMB_H = 80;
+    const float THUMB_H = 100;
     const float Y_OFF = CELL_HEIGHT - OLD_H;
 
     this->setContentSize(ccp(315, CELL_HEIGHT));
@@ -127,7 +127,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     tpDelete->setVisible(false);
 
     if (!tp->ThumbnailURL.empty()) {
-        float thumbMaxW = 280;
+        float thumbMaxW = 300;
         float thumbMaxH = THUMB_H;
 
         thumbnail = geode::LazySprite::create({thumbMaxW, thumbMaxH});
