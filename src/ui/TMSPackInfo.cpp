@@ -56,21 +56,14 @@ bool TMSPackInfo::init(TMSPack* tp)
     std::string fullDesc = fmt::format("# {}\n{}", tp->TPName, tp->TPDescription);
 
     if (!tp->ThumbnailURL.empty()) {
-        float thumbMaxW = 280;
+        float thumbMaxW = 240;
         float thumbMaxH = 100;
-        float cornerRadius = 10;
-
-        auto stencil = CCDrawNode::create();
-        auto clipNode = CCClippingNode::create(stencil);
-        clipNode->setAlphaThreshold(0.5f);
-        clipNode->setContentSize({thumbMaxW, thumbMaxH});
 
         LazySprite* thumbnail = LazySprite::create({thumbMaxW, thumbMaxH});
-        thumbnail->setAnchorPoint({0, 0});
-        clipNode->addChild(thumbnail);
+        thumbnail->setAnchorPoint({0.5, 0.5});
 
         thumbnail->setLoadCallback(
-            [this, reloadThumbnailTries = 0, tp, thumbnail, stencil, clipNode, thumbMaxW, thumbMaxH, cornerRadius](Result<> result) mutable {
+            [this, reloadThumbnailTries = 0, tp, thumbnail, thumbMaxW, thumbMaxH](Result<> result) mutable {
                 if (!result.isOk()) 
                 {
                     if (reloadThumbnailTries < 3) {
@@ -79,7 +72,7 @@ bool TMSPackInfo::init(TMSPack* tp)
                         reloadThumbnailTries += 1;
                     } else {
                         log::error("failed to load thumbnail after 3 attempts, hiding thumbnail.");
-                        clipNode->setVisible(false);
+                        thumbnail->setVisible(false);
                     }
                     return;
                 }
@@ -88,59 +81,18 @@ bool TMSPackInfo::init(TMSPack* tp)
                 float scale = std::min(thumbMaxW / size.width, thumbMaxH / size.height);
                 scale = std::min(scale, 1.0f);
                 thumbnail->setScale(scale);
-
-                float finalW = size.width * scale;
-                float finalH = size.height * scale;
-
-                thumbnail->setPositionX(roundf((thumbMaxW - finalW) / 2));
-                thumbnail->setPositionY(roundf((thumbMaxH - finalH) / 2));
-
-                const int segs = 16;
-                int total = segs * 4;
-                CCPoint verts[total];
-                float r = cornerRadius;
-                float w = thumbMaxW;
-                float h = thumbMaxH;
-
-                for (int i = 0; i < total; i++) {
-                    int corner = i / segs;
-                    int seg = i % segs;
-                    float angle;
-                    float cx, cy;
-
-                    switch (corner) {
-                        case 0:
-                            angle = -M_PI_2 + (M_PI_2 * seg) / segs;
-                            cx = w - r; cy = h - r;
-                            break;
-                        case 1:
-                            angle = M_PI + (M_PI_2 * seg) / segs;
-                            cx = r; cy = h - r;
-                            break;
-                        case 2:
-                            angle = M_PI_2 + (M_PI_2 * seg) / segs;
-                            cx = r; cy = r;
-                            break;
-                        case 3:
-                            angle = (M_PI_2 * seg) / segs;
-                            cx = w - r; cy = r;
-                            break;
-                    }
-                    verts[i] = CCPoint{cx + r * cosf(angle), cy + r * sinf(angle)};
-                }
-                stencil->drawPolygon(verts, total, {1, 1, 1, 1}, 0, {1, 1, 1, 1});
             }
         );
         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
 
-        this->m_mainLayer->addChild(clipNode);
-        clipNode->setPosition({27.5, 130});
+        this->m_mainLayer->addChild(thumbnail);
+        thumbnail->setPosition({167.5, 165});
     }
 
     auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
     this->m_mainLayer->addChild(desc);
     desc->setPosition(line->getPosition());
-    desc->setPositionY(desc->getPositionY() - 95);
+    desc->setPositionY(desc->getPositionY() - 120);
 
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.5);
