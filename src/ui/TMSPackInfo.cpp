@@ -55,9 +55,14 @@ bool TMSPackInfo::init(TMSPack* tp)
 
     std::string fullDesc = fmt::format("# {}\n{}", tp->TPName, tp->TPDescription);
 
+    auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
+    this->m_mainLayer->addChild(desc);
+    desc->setPosition(line->getPosition());
+    desc->setPositionY(desc->getPositionY() - 75);
+
     if (!tp->ThumbnailURL.empty()) {
-        float thumbMaxW = 240;
-        float thumbMaxH = 100;
+        float thumbMaxW = 310;
+        float thumbMaxH = 80;
 
         LazySprite* thumbnail = LazySprite::create({thumbMaxW, thumbMaxH});
         thumbnail->setAnchorPoint({0.5, 0.5});
@@ -86,13 +91,8 @@ bool TMSPackInfo::init(TMSPack* tp)
         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
 
         this->m_mainLayer->addChild(thumbnail);
-        thumbnail->setPosition({167.5, 165});
+        thumbnail->setPosition({167.5, 40});
     }
-
-    auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
-    this->m_mainLayer->addChild(desc);
-    desc->setPosition(line->getPosition());
-    desc->setPositionY(desc->getPositionY() - 130);
 
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.5);
