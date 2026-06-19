@@ -92,7 +92,7 @@ bool TMSPackInfo::init(TMSPack* tp)
     auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
     this->m_mainLayer->addChild(desc);
     desc->setPosition(line->getPosition());
-    desc->setPositionY(desc->getPositionY() - 120);
+    desc->setPositionY(desc->getPositionY() - 130);
 
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.5);
