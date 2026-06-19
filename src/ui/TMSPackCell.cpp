@@ -66,7 +66,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.4);
     nameLabel->setAnchorPoint(ccp(0, 0.5f));
-    nameLabel->setPosition({35.5, 26.5 + Y_OFF}); // OH BOY I LOVE HARDCODING!
+    nameLabel->setPosition({35.5f, 26.5f + Y_OFF}); // OH BOY I LOVE HARDCODING!
     nameLabel->setZOrder(1);
     this->addChild(nameLabel);
 
@@ -83,7 +83,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
         "goldFont.fnt"
     );
     texturePackCreator->setScale(0.3);
-    texturePackCreator->setPosition({35.5, 16.5 + Y_OFF});
+    texturePackCreator->setPosition({35.5f, 16.5f + Y_OFF});
     texturePackCreator->setAnchorPoint(ccp(0, 0.5f));
     texturePackCreator->setZOrder(1);
     this->addChild(texturePackCreator);
@@ -134,30 +134,30 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
         thumbnail->setAnchorPoint({0.5, 0.5});
 
         thumbnail->setLoadCallback(
-            [this, reloadThumbnailTries = 0, tp, thumbnail, thumbMaxW, thumbMaxH](Result<> result) mutable {
+            [this, reloadThumbnailTries = 0, tp, thumbMaxW, thumbMaxH](Result<> result) mutable {
                 if (!result.isOk()) 
                 {
                     if (reloadThumbnailTries < 3) {
                         log::info("failed to load thumbnail, retrying... (attempt {}/3)", reloadThumbnailTries + 1); 
-                        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
+                        this->thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
                         reloadThumbnailTries += 1;
                     } else {
                         log::error("failed to load thumbnail after 3 attempts, hiding thumbnail.");
-                        thumbnail->setVisible(false);
+                        this->thumbnail->setVisible(false);
                     }
                     return;
                 }
 
-                auto size = thumbnail->getContentSize();
+                auto size = this->thumbnail->getContentSize();
                 float scale = std::min(thumbMaxW / size.width, thumbMaxH / size.height);
                 scale = std::min(scale, 1.0f);
-                thumbnail->setScale(scale);
+                this->thumbnail->setScale(scale);
             }
         );
         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
 
         this->addChild(thumbnail);
-        thumbnail->setPosition({157.5, THUMB_H / 2 + 2.5});
+        thumbnail->setPosition({157.5f, THUMB_H / 2.0f + 2.5f});
     }
 
     texturePack->downloadingIndicator = Slider::create(this, nullptr);
