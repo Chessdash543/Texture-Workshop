@@ -125,7 +125,7 @@ bool TMSPackInfo::init(TMSPack* tp)
                             cx = w - r; cy = r;
                             break;
                     }
-                    verts[i] = {cx + r * cosf(angle), cy + r * sinf(angle)};
+                    verts[i] = CCPoint{cx + r * cosf(angle), cy + r * sinf(angle)};
                 }
                 stencil->drawPolygon(verts, total, {1, 1, 1, 1}, 0, {1, 1, 1, 1});
             }
