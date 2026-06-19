@@ -400,7 +400,7 @@ void TMSLayer::getTexturePacksCount(std::string searchQuery) {
         this->addChild(pageCount);
         pageCount->setScale(0.3);
         pageCount->setAnchorPoint({1, 1});
-        pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+        pageCount->setPosition(ccp(CCDirector::sharedDirector()->getScreenRight() - 2, CCDirector::sharedDirector()->getScreenTop() - 2));
     }
 
     log::info("Calculated pagination: Page {}/{} ({} total items)", boobs::page, totalPages, totalItems);

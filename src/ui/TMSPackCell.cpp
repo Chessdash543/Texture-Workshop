@@ -131,7 +131,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
 
     if (std::filesystem::exists(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->TPName))) {
         if (texturePack->TPVersion != Mod::get()->getSavedValue<std::string>(texturePack->TPName)) {
-            gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 60, 255, 99.96000000000001));
+            gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 60, 255, 100));
             gradient->setContentSize(this->getContentSize());
             gradient->setZOrder(-3);
             gradient->setVector(ccp(90, 0));
