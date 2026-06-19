@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "./headers/TMSPackInfo.hpp"
 #include "./headers/TMSPackCell.hpp"
 
@@ -84,8 +85,8 @@ bool TMSPackInfo::init(TMSPack* tp)
                 }
 
                 auto size = thumbnail->getContentSize();
-                float scale = MIN(thumbMaxW / size.width, thumbMaxH / size.height);
-                scale = MIN(scale, 1.0f);
+                float scale = std::min(thumbMaxW / size.width, thumbMaxH / size.height);
+                scale = std::min(scale, 1.0f);
                 thumbnail->setScale(scale);
 
                 float finalW = size.width * scale;
