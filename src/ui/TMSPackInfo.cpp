@@ -58,41 +58,7 @@ bool TMSPackInfo::init(TMSPack* tp)
     auto desc = MDTextArea::create(fullDesc, ccp(300, 90));
     this->m_mainLayer->addChild(desc);
     desc->setPosition(line->getPosition());
-    desc->setPositionY(desc->getPositionY() - 75);
-
-    if (!tp->ThumbnailURL.empty()) {
-        float thumbMaxW = 310;
-        float thumbMaxH = 80;
-
-        LazySprite* thumbnail = LazySprite::create({thumbMaxW, thumbMaxH});
-        thumbnail->setAnchorPoint({0.5, 0.5});
-
-        thumbnail->setLoadCallback(
-            [this, reloadThumbnailTries = 0, tp, thumbnail, thumbMaxW, thumbMaxH](Result<> result) mutable {
-                if (!result.isOk()) 
-                {
-                    if (reloadThumbnailTries < 3) {
-                        log::info("failed to load thumbnail, retrying... (attempt {}/3)", reloadThumbnailTries + 1); 
-                        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
-                        reloadThumbnailTries += 1;
-                    } else {
-                        log::error("failed to load thumbnail after 3 attempts, hiding thumbnail.");
-                        thumbnail->setVisible(false);
-                    }
-                    return;
-                }
-
-                auto size = thumbnail->getContentSize();
-                float scale = std::min(thumbMaxW / size.width, thumbMaxH / size.height);
-                scale = std::min(scale, 1.0f);
-                thumbnail->setScale(scale);
-            }
-        );
-        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
-
-        this->m_mainLayer->addChild(thumbnail);
-        thumbnail->setPosition({167.5, 40});
-    }
+    desc->setPositionY(desc->getPositionY() - 95);
 
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.5);

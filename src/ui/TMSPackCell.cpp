@@ -23,7 +23,11 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
         this->setOpacity(50); 
     }
 
-    this->setContentSize(ccp(315, 35));
+    const float OLD_H = 35;
+    const float THUMB_H = 80;
+    const float Y_OFF = CELL_HEIGHT - OLD_H;
+
+    this->setContentSize(ccp(315, CELL_HEIGHT));
     this->setAnchorPoint(ccp(0, 1));
 
     float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
@@ -48,13 +52,13 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     this->addChild(icon);
     icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
     icon->setScale(0.35 * scale);
-    icon->setPosition({ 18, this->getContentSize().height / 2 });
+    icon->setPosition({ 18, OLD_H / 2 + Y_OFF });
     icon->setZOrder(1);
 
     if (texturePack->featured) {
         auto featuredSpr = CCSprite::createWithSpriteFrameName("TMS_Featured.png"_spr);
         featuredSpr->setScale(0.35);
-        featuredSpr->setPosition({ 18, this->getContentSize().height / 2 });
+        featuredSpr->setPosition({ 18, OLD_H / 2 + Y_OFF });
         this->addChild(featuredSpr);
     }
 
@@ -62,14 +66,14 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.4);
     nameLabel->setAnchorPoint(ccp(0, 0.5f));
-    nameLabel->setPosition({35.5, 26.5}); // OH BOY I LOVE HARDCODING!
+    nameLabel->setPosition({35.5, 26.5 + Y_OFF}); // OH BOY I LOVE HARDCODING!
     nameLabel->setZOrder(1);
     this->addChild(nameLabel);
 
     versionLabel = CCLabelBMFont::create(formatTPVersion(tp->TPVersion).c_str(), "bigFont.fnt");
     versionLabel->setScale(0.2);
     versionLabel->setAnchorPoint(ccp(0, 1));
-    versionLabel->setPosition({35.5, 12}); // OH BOY I LOVE HARDCODING!
+    versionLabel->setPosition({35.5, 12 + Y_OFF}); // OH BOY I LOVE HARDCODING!
     versionLabel->setColor({51, 153, 255});
     versionLabel->setZOrder(1);
     this->addChild(versionLabel);
@@ -79,7 +83,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
         "goldFont.fnt"
     );
     texturePackCreator->setScale(0.3);
-    texturePackCreator->setPosition({35.5, 16.5});
+    texturePackCreator->setPosition({35.5, 16.5 + Y_OFF});
     texturePackCreator->setAnchorPoint(ccp(0, 0.5f));
     texturePackCreator->setZOrder(1);
     this->addChild(texturePackCreator);
@@ -99,7 +103,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     
     this->addChild(buttonMenu);
     buttonMenu->addChild(tpInfoPage);
-    tpInfoPage->setPosition(ccp(nameLabel->getPosition().x + nameLabel->getScaledContentWidth() + 6, 25.5));
+    tpInfoPage->setPosition(ccp(nameLabel->getPosition().x + nameLabel->getScaledContentWidth() + 6, 25.5 + Y_OFF));
 
     auto tpDownloadSpr = CCSprite::createWithSpriteFrameName("TMS_DownloadButton.png"_spr);
     tpDownloadSpr->setScale(.65);
@@ -109,7 +113,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
         menu_selector(TMSPackCell::onDownload)
     );
     buttonMenu->addChild(tpDownload);
-    tpDownload->setPosition({ 288, this->getContentHeight() / 2 });
+    tpDownload->setPosition({ 288, OLD_H / 2 + Y_OFF });
 
     auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TMS_DeleteButton.png"_spr);
     tpDeleteSpr->setScale(.65);
@@ -119,8 +123,42 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
         menu_selector(TMSPackCell::onDelete)
     );
     buttonMenu->addChild(tpDelete);
-    tpDelete->setPosition({ 288, this->getContentHeight() / 2 });
+    tpDelete->setPosition({ 288, OLD_H / 2 + Y_OFF });
     tpDelete->setVisible(false);
+
+    if (!tp->ThumbnailURL.empty()) {
+        float thumbMaxW = 280;
+        float thumbMaxH = THUMB_H;
+
+        thumbnail = geode::LazySprite::create({thumbMaxW, thumbMaxH});
+        thumbnail->setAnchorPoint({0.5, 0.5});
+
+        thumbnail->setLoadCallback(
+            [this, reloadThumbnailTries = 0, tp, thumbnail, thumbMaxW, thumbMaxH](Result<> result) mutable {
+                if (!result.isOk()) 
+                {
+                    if (reloadThumbnailTries < 3) {
+                        log::info("failed to load thumbnail, retrying... (attempt {}/3)", reloadThumbnailTries + 1); 
+                        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
+                        reloadThumbnailTries += 1;
+                    } else {
+                        log::error("failed to load thumbnail after 3 attempts, hiding thumbnail.");
+                        thumbnail->setVisible(false);
+                    }
+                    return;
+                }
+
+                auto size = thumbnail->getContentSize();
+                float scale = std::min(thumbMaxW / size.width, thumbMaxH / size.height);
+                scale = std::min(scale, 1.0f);
+                thumbnail->setScale(scale);
+            }
+        );
+        thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
+
+        this->addChild(thumbnail);
+        thumbnail->setPosition({157.5, THUMB_H / 2 + 2.5});
+    }
 
     texturePack->downloadingIndicator = Slider::create(this, nullptr);
     this->addChild(texturePack->downloadingIndicator);

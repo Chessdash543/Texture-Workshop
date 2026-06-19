@@ -15,10 +15,13 @@ using namespace geode::prelude;
 class TMSPackCell : public CCLayerColor {
     public:
 
+        static constexpr float CELL_HEIGHT = 120;
+
         TMSPack* texturePack;
 
         // texture pack info, hey guys its me uproxide this is my awesome comment
         geode::LazySprite* icon;
+        geode::LazySprite* thumbnail;
         CCLabelBMFont* nameLabel;
         CCLabelBMFont* versionLabel;
         CCLayerGradient* gradient;

@@ -459,7 +459,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
                                          : TMSPackCell::create(tp, stupid);
 
         scroll->m_contentLayer->addChild(tpCell);
-        tpCell->setPosition(0, 314 - (35 * i));
+        tpCell->setPosition(0, 314 - (TMSPackCell::CELL_HEIGHT * i));
         tpCell->pagesMenu = pagesMenu;
         tpCell->inp = inp;
         i++;
@@ -469,7 +469,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
         nextPage->setVisible(false);
     }
 
-    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 35 * 10));
+    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, TMSPackCell::CELL_HEIGHT * 10));
     scroll->moveToTop();
 }
 
