@@ -391,7 +391,6 @@ void TMSLayer::getTexturePacksCount(std::string searchQuery) {
     nextPage->setVisible(boobs::page < totalPages);
 
     // Update page count display
-    auto director = CCDirector::sharedDirector();
     std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, totalPages, totalItems).c_str();
     if (pageCount) {
         pageCount->setString(formattedText.c_str());

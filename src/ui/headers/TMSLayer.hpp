@@ -55,7 +55,6 @@ public:
     std::vector<TMSPack*> tps = {};
 
     void onClose(CCObject*);
-    void searchTPs();
     void keyBackClicked();
 
     void getTexturePacks(std::string searchQuery);
@@ -65,9 +64,7 @@ public:
     void onDiscord(CCObject*);
     void onPacksFolder(CCObject*);
     void onRefresh(CCObject*);
-    void onRefreshSearch(CCObject*);
     void onSearch(CCObject*);
-    void onFilter(CCObject*);
 
     void onSort(CCObject*);
 

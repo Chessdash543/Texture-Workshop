@@ -58,7 +58,6 @@ class TMSPackCell : public CCLayerColor {
         bool init(TMSPack* tp, bool other);
 
         void onInfo(CCObject*);
-        void onCreator(CCObject*);
         void onDownload(CCObject*);
         void onDelete(CCObject*);
 

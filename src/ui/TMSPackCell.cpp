@@ -208,7 +208,7 @@ void TMSPackCell::updateDownloadStata() { // stata :joy:
             this->removeChild(gradient);
             gradient = nullptr;
         }
-        Notification::create("Download Complete!", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"));
+        Notification::create("Download Complete!", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
         gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 255, 0, 100));
         gradient->setContentSize(this->getContentSize());
         gradient->setZOrder(-3);

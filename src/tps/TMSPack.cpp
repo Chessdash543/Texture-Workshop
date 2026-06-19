@@ -40,7 +40,7 @@ void TMSPack::downloadTP() {
 
             if (res.ok()) {
                 if(res.into(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), TPName))) {
-                    Notification::create("Download Complete!", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"));
+                    Notification::create("Download Complete!", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
                     downloadSuccessful = true;
                     isDownloading = false;
                     boobs::downloading.erase(std::remove(boobs::downloading.begin(), boobs::downloading.end(), this), boobs::downloading.end()); // texture workshop pack sacrificing itself to kill cheeseworks
