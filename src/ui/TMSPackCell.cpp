@@ -129,9 +129,54 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     if (!tp->ThumbnailURL.empty()) {
         float thumbMaxW = 310;
         float thumbMaxH = THUMB_H;
+        float cornerRadius = 10;
+
+        auto stencil = CCDrawNode::create();
+        {
+            const int segs = 16;
+            int total = segs * 4;
+            CCPoint verts[total];
+            float r = cornerRadius;
+            float w = thumbMaxW;
+            float h = thumbMaxH;
+
+            for (int i = 0; i < total; i++) {
+                int corner = i / segs;
+                int seg = i % segs;
+                float angle;
+                float cx, cy;
+
+                switch (corner) {
+                    case 0:
+                        angle = -M_PI_2 + (M_PI_2 * seg) / segs;
+                        cx = w - r; cy = h - r;
+                        break;
+                    case 1:
+                        angle = M_PI + (M_PI_2 * seg) / segs;
+                        cx = r; cy = h - r;
+                        break;
+                    case 2:
+                        angle = M_PI_2 + (M_PI_2 * seg) / segs;
+                        cx = r; cy = r;
+                        break;
+                    case 3:
+                        angle = (M_PI_2 * seg) / segs;
+                        cx = w - r; cy = r;
+                        break;
+                }
+                verts[i] = CCPoint{cx + r * cosf(angle), cy + r * sinf(angle)};
+            }
+            stencil->drawPolygon(verts, total, {1, 1, 1, 1}, 0, {1, 1, 1, 1});
+        }
+
+        auto clipNode = CCClippingNode::create(stencil);
+        clipNode->setAlphaThreshold(0.5f);
+        clipNode->setContentSize({thumbMaxW, thumbMaxH});
+        clipNode->setAnchorPoint({0.5, 0.5});
 
         thumbnail = geode::LazySprite::create({thumbMaxW, thumbMaxH});
-        thumbnail->setAnchorPoint({0.5, 0.5});
+        thumbnail->setAnchorPoint({0, 0});
+        clipNode->addChild(thumbnail);
 
         thumbnail->setLoadCallback(
             [this, reloadThumbnailTries = 0, tp, thumbMaxW, thumbMaxH](Result<> result) mutable {
@@ -152,12 +197,17 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
                 float scale = std::min(thumbMaxW / size.width, thumbMaxH / size.height);
                 scale = std::min(scale, 1.0f);
                 this->thumbnail->setScale(scale);
+
+                float finalW = size.width * scale;
+                float finalH = size.height * scale;
+                this->thumbnail->setPositionX(roundf((thumbMaxW - finalW) / 2));
+                this->thumbnail->setPositionY(roundf((thumbMaxH - finalH) / 2));
             }
         );
         thumbnail->loadFromUrl(tp->ThumbnailURL, geode::LazySprite::Format::kFmtPng);
 
-        this->addChild(thumbnail);
-        thumbnail->setPosition({157.5f, THUMB_H / 2.0f + 2.5f});
+        this->addChild(clipNode);
+        clipNode->setPosition({157.5f, THUMB_H / 2.0f + 2.5f});
     }
 
     texturePack->downloadingIndicator = Slider::create(this, nullptr);
