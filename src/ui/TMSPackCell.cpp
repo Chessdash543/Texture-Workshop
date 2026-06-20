@@ -127,7 +127,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     tpDelete->setVisible(false);
 
     if (!tp->ThumbnailURL.empty()) {
-        float thumbMaxW = 310;
+        float thumbMaxW = 313;
         float thumbMaxH = THUMB_H;
         float cornerRadius = 10;
 
