@@ -127,7 +127,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     tpDelete->setVisible(false);
 
     if (!tp->ThumbnailURL.empty()) {
-        float thumbMaxW = 300;
+        float thumbMaxW = 310;
         float thumbMaxH = THUMB_H;
 
         thumbnail = geode::LazySprite::create({thumbMaxW, thumbMaxH});
