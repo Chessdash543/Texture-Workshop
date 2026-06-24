@@ -1,3 +1,6 @@
+# 1.0.4
+* Fixed issue with cell layout being weird
+
 # 1.0.3
 * Fixed dependency issue
 
