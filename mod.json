@@ -11,6 +11,9 @@
 	"name": "Texture Makers Workshop",
 	"developer": "TMS Team",
 	"description": "A fork from Texture WorkShop :)",
+	"dependencies": {
+		"geode.texture-loader": ">=1.10.2"
+	},
 	"resources": {
 		"spritesheets": {
 			"TMSSheet": [
