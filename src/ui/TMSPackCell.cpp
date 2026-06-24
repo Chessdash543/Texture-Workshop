@@ -24,7 +24,7 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     }
 
     const float OLD_H = 35;
-    const float THUMB_H = 100;
+    const float THUMB_H = 0;
     const float Y_OFF = CELL_HEIGHT - OLD_H;
 
     this->setContentSize(ccp(315, CELL_HEIGHT));

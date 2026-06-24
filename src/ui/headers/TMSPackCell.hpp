@@ -15,7 +15,7 @@ using namespace geode::prelude;
 class TMSPackCell : public CCLayerColor {
     public:
 
-        static constexpr float CELL_HEIGHT = 140;
+        static constexpr float CELL_HEIGHT = 35;
 
         TMSPack* texturePack;
 

@@ -188,7 +188,7 @@ bool TMSLayer::init() {
     scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
     scroll->setZOrder(-1);
-    scroll->setPosition(8, 8);
+    scroll->setPosition(8, 13); // Fix weird offset with an albeit, shitty solution
 
     outline->addChild(scroll);
 
@@ -459,7 +459,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
                                          : TMSPackCell::create(tp, stupid);
 
         scroll->m_contentLayer->addChild(tpCell);
-        tpCell->setPosition(0, TMSPackCell::CELL_HEIGHT * (10 - 1 - i) - 8);
+        tpCell->setPosition(0, (TMSPackCell::CELL_HEIGHT * (10 - 1 - i) - 8) + 8); // hardcoded 8 because layout is weird
         tpCell->pagesMenu = pagesMenu;
         tpCell->inp = inp;
         i++;
@@ -469,7 +469,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
         nextPage->setVisible(false);
     }
 
-    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, TMSPackCell::CELL_HEIGHT * 10));
+    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 8 + TMSPackCell::CELL_HEIGHT * 10));
     scroll->moveToTop();
 }
 
