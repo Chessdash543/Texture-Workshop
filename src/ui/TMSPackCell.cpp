@@ -24,10 +24,11 @@ bool TMSPackCell::init(TMSPack* tp, bool other) {
     }
 
     const float OLD_H = 35;
-    const float THUMB_H = 0;
-    const float Y_OFF = CELL_HEIGHT - OLD_H;
+    const float THUMB_H = tp->ThumbnailURL.empty() ? 0 : 80;
+    const float cellHeight = OLD_H + THUMB_H;
+    const float Y_OFF = cellHeight - OLD_H;
 
-    this->setContentSize(ccp(315, CELL_HEIGHT));
+    this->setContentSize(ccp(315, cellHeight));
     this->setAnchorPoint(ccp(0, 1));
 
     float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
@@ -274,6 +275,10 @@ void TMSPackCell::onDelete(CCObject*) {
             }
         }
     );
+}
+
+float TMSPackCell::heightForPack(TMSPack* tp) {
+    return tp->ThumbnailURL.empty() ? 35 : 115;
 }
 
 void TMSPackCell::updateDownloadStata() { // stata :joy:

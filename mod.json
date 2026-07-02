@@ -37,6 +37,13 @@
 			"description": "Filter TPs to only show TPs that support the current GD Version",
 			"type": "bool",
 			"default": true
+		},
+
+		"texture-pack-url":{
+			"type":"string",
+			"name":"Texture Pack URL ",
+			"description":"Urls to fetch Texture packs",
+			"default":"https://texture-makers-server.vercel.app/data/tms.json"
 		}
 	},
 	"tags": [

@@ -271,7 +271,7 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
 
     auto req = geode::utils::web::WebRequest();
 
-    std::string url = "https://texture-makers-server.vercel.app/data/tms.json";
+    std::string url = Mod::get()->getSavedValue<std::string>("texture-pack-url");
 
     log::debug("Fetching texture packs from: {}", url);
 
@@ -419,6 +419,8 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
     prevPage->setVisible(boobs::page > 1);
     nextPage->setVisible(true);
 
+    float currentY = 0;
+
     for (auto& tpObject : pageSubset) {
         bool featured = tpObject["packFeature"].asInt().unwrap() == 1;
 
@@ -455,11 +457,12 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
             }
         }
 
-        TMSPackCell* tpCell = existingTp ? TMSPackCell::create(existingTp, stupid)
-                                         : TMSPackCell::create(tp, stupid);
+        TMSPack* targetTp = existingTp ? existingTp : tp;
+        TMSPackCell* tpCell = TMSPackCell::create(targetTp, stupid);
 
         scroll->m_contentLayer->addChild(tpCell);
-        tpCell->setPosition(0, (TMSPackCell::CELL_HEIGHT * (10 - 1 - i) - 8) + 8); // hardcoded 8 because layout is weird
+        tpCell->setPosition(0, currentY);
+        currentY += TMSPackCell::heightForPack(targetTp);
         tpCell->pagesMenu = pagesMenu;
         tpCell->inp = inp;
         i++;
@@ -469,7 +472,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
         nextPage->setVisible(false);
     }
 
-    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 8 + TMSPackCell::CELL_HEIGHT * 10));
+    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 8 + currentY));
     scroll->moveToTop();
 }
 
