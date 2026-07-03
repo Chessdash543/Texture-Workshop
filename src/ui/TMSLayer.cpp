@@ -419,8 +419,6 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
     prevPage->setVisible(boobs::page > 1);
     nextPage->setVisible(true);
 
-    float currentY = 0;
-
     for (auto& tpObject : pageSubset) {
         bool featured = tpObject["packFeature"].asInt().unwrap() == 1;
 
@@ -457,12 +455,11 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
             }
         }
 
-        TMSPack* targetTp = existingTp ? existingTp : tp;
-        TMSPackCell* tpCell = TMSPackCell::create(targetTp, stupid);
+        TMSPackCell* tpCell = existingTp ? TMSPackCell::create(existingTp, stupid)
+                                         : TMSPackCell::create(tp, stupid);
 
         scroll->m_contentLayer->addChild(tpCell);
-        tpCell->setPosition(0, currentY);
-        currentY += TMSPackCell::heightForPack(targetTp);
+        tpCell->setPosition(0, (TMSPackCell::CELL_HEIGHT * (10 - 1 - i) - 8) + 8);
         tpCell->pagesMenu = pagesMenu;
         tpCell->inp = inp;
         i++;
@@ -472,7 +469,7 @@ void TMSLayer::setupTPCells(const matjson::Value& pageSubset) {
         nextPage->setVisible(false);
     }
 
-    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 8 + currentY));
+    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, 8 + TMSPackCell::CELL_HEIGHT * 10));
     scroll->moveToTop();
 }
 
