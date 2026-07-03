@@ -271,7 +271,7 @@ void TMSLayer::getTexturePacks(std::string searchQuery) {
 
     auto req = geode::utils::web::WebRequest();
 
-    std::string url = Mod::get()->getSavedValue<std::string>("texture-pack-url");
+    std::string url = Mod::get()->getSettingValue<std::string>("texture-pack-url");
 
     log::debug("Fetching texture packs from: {}", url);
 

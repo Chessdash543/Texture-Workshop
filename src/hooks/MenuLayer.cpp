@@ -23,9 +23,7 @@ class $modify(MyMenuLayer, MenuLayer) {
 		menu->addChild(wsButton);
 		wsButton->setID("workshop-button"_spr);
 		menu->updateLayout();
-		if (Mod::get()->getSavedValue<bool>("version-filter")) {
-			boobs::versionFilter = Mod::get()->getSavedValue<bool>("version-filter");
-		}
+		boobs::versionFilter = Mod::get()->getSettingValue<bool>("version-filter");
 		return true;
 	}
 
